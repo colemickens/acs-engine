@@ -119,6 +119,7 @@ type MasterProfile struct {
 	VnetSubnetID             string `json:"vnetSubnetID,omitempty"`
 	FirstConsecutiveStaticIP string `json:"firstConsecutiveStaticIP,omitempty"`
 	StorageProfile           string `json:"storageProfile,omitempty"`
+	ManagedServiceIdentity   bool   `json:"managedServiceIdentity,omitempty"`
 
 	// subnet is internal
 	subnet string
@@ -134,16 +135,17 @@ type ClassicAgentPoolProfileType string
 
 // AgentPoolProfile represents an agent pool definition
 type AgentPoolProfile struct {
-	Name                string `json:"name"`
-	Count               int    `json:"count"`
-	VMSize              string `json:"vmSize"`
-	DNSPrefix           string `json:"dnsPrefix,omitempty"`
-	OSType              OSType `json:"osType,omitempty"`
-	Ports               []int  `json:"ports,omitempty"`
-	AvailabilityProfile string `json:"availabilityProfile"`
-	StorageProfile      string `json:"storageProfile"`
-	DiskSizesGB         []int  `json:"diskSizesGB,omitempty"`
-	VnetSubnetID        string `json:"vnetSubnetID,omitempty"`
+	Name                   string `json:"name"`
+	Count                  int    `json:"count"`
+	VMSize                 string `json:"vmSize"`
+	DNSPrefix              string `json:"dnsPrefix,omitempty"`
+	OSType                 OSType `json:"osType,omitempty"`
+	Ports                  []int  `json:"ports,omitempty"`
+	AvailabilityProfile    string `json:"availabilityProfile"`
+	StorageProfile         string `json:"storageProfile"`
+	DiskSizesGB            []int  `json:"diskSizesGB,omitempty"`
+	VnetSubnetID           string `json:"vnetSubnetID,omitempty"`
+	ManagedServiceIdentity bool   `json:"managedServiceIdentity,omitempty"`
 
 	// subnet is internal
 	subnet string
