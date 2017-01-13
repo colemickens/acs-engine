@@ -156,7 +156,7 @@
       "apiVersion": "2015-01-01",
       "type": "Microsoft.Resources/deployments",
       "copy": {
-        "count": "[variables('masterCount')]",
+        "count": "[variables('{{.Name}}Count')]",
         "name": "vmLoopNode"
       },
       "name": "[concat('vm-msi-rbac-', variables('{{.Name}}VMNamePrefix'), copyIndex())]",
@@ -166,7 +166,7 @@
       "properties": {
         "mode": "incremental",
         "templateLink": {
-          "uri": "[concat('https://rbacgenerator.azurewebsites.net/api/rbacgenerator?subscription_id=', variables('subscriptionId'), '&resource_group=', variables('resourceGroup'), '&role_id=', variables('contributorRoleDefinitionId'), '&vm_name=', variables('masterVMNamePrefix'), copyIndex(), '&principal_id=', reference(concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), copyIndex())).identity.principalId)]",
+          "uri": "[concat('https://rbacgenerator.azurewebsites.net/api/rbacgenerator?subscription_id=', variables('subscriptionId'), '&resource_group=', variables('resourceGroup'), '&role_id=', variables('readerRoleDefinitionId'), '&vm_name=', variables('masterVMNamePrefix'), copyIndex(), '&principal_id=', reference(concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), copyIndex())).identity.principalId)]",
           "contentVersion": "1.0.0.0"
         }
       }
