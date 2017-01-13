@@ -113,6 +113,8 @@ write_files:
                 mountPath: "/etc/kubernetes"
               - name: "var-lib-kubelet"
                 mountPath: "/var/lib/kubelet"
+              - name: "msi"
+                mountPath: "/var/lib/waagent/ManagedIdentity-Settings"
         volumes:
           - name: "etc-kubernetes"
             hostPath:
@@ -120,6 +122,9 @@ write_files:
           - name: "var-lib-kubelet"
             hostPath:
               path: "/var/lib/kubelet"
+          - name: "msi"
+            hostPath:
+              path: "/var/lib/waagent/ManagedIdentity-Settings"
 
 - path: /etc/kubernetes/manifests/kube-controller-manager.yaml
   permissions: "0644"
@@ -156,6 +161,8 @@ write_files:
                 mountPath: "/etc/kubernetes"
               - name: "var-lib-kubelet"
                 mountPath: "/var/lib/kubelet"
+              - name: "msi"
+                mountPath: "/var/lib/waagent/ManagedIdentity-Settings"
         volumes:
           - name: "etc-kubernetes"
             hostPath:
@@ -163,6 +170,9 @@ write_files:
           - name: "var-lib-kubelet"
             hostPath:
               path: "/var/lib/kubelet"
+          - name: "msi"
+            hostPath:
+              path: "/var/lib/waagent/ManagedIdentity-Settings"
 
 - path: /etc/kubernetes/manifests/kube-scheduler.yaml
   permissions: "0644"
@@ -293,35 +303,8 @@ write_files:
     ExecStartPre=/bin/sed -i "s|<kubernetesHyperkubeSpec>|{{{kubernetesHyperkubeSpec}}}|g" "/etc/kubernetes/addons/kube-proxy-daemonset.yaml"
     ExecStartPre=/bin/mount --bind /var/lib/kubelet /var/lib/kubelet
     ExecStartPre=/bin/mount --make-shared /var/lib/kubelet
-    ExecStart=/usr/bin/docker run \
-      --net=host \
-      --pid=host \
-      --privileged \
-      --volume=/dev:/dev \
-      --volume=/sys:/sys:ro \
-      --volume=/var/run:/var/run:rw \
-      --volume=/var/lib/docker/:/var/lib/docker:rw \
-      --volume=/var/lib/kubelet/:/var/lib/kubelet:shared \
-      --volume=/var/log:/var/log:rw \
-      --volume=/etc/kubernetes/:/etc/kubernetes:ro \
-      --volume=/srv/kubernetes/:/srv/kubernetes:ro \
-        {{{kubernetesHyperkubeSpec}}} \
-          /hyperkube kubelet \
-            --api-servers="https://{{{masterPrivateIp}}}:443" \
-            --kubeconfig=/var/lib/kubelet/kubeconfig \
-            --address=0.0.0.0 \
-            --allow-privileged=true \
-            --enable-server \
-            --enable-debugging-handlers \
-            --config=/etc/kubernetes/manifests \
-            --cluster-dns={{{kubeDnsServiceIP}}} \
-            --cluster-domain=cluster.local \
-            --register-schedulable=false \
-            --cloud-provider=azure \
-            --cloud-config=/etc/kubernetes/azure.json \
-            --v=2
+    ExecStart=/usr/bin/docker run --net=host --pid=host --privileged --volume=/dev:/dev --volume=/sys:/sys:ro --volume=/var/run:/var/run:rw --volume=/var/lib/docker/:/var/lib/docker:rw --volume=/var/lib/kubelet/:/var/lib/kubelet:shared --volume=/var/log:/var/log:rw --volume=/etc/kubernetes/:/etc/kubernetes:ro --volume=/srv/kubernetes/:/srv/kubernetes:ro --volume=/var/lib/waagent/ManagedIdentity-Settings:/var/lib/waagent/ManagedIdentity-Settings:ro {{{kubernetesHyperkubeSpec}}} /hyperkube kubelet --api-servers="https://{{{masterPrivateIp}}}:443" --kubeconfig=/var/lib/kubelet/kubeconfig --address=0.0.0.0 --allow-privileged=true --enable-server --enable-debugging-handlers --pod-manifest-path=/etc/kubernetes/manifests --cluster-dns={{{kubeDnsServiceIP}}} --cluster-domain=cluster.local --register-schedulable=false --cloud-provider=azure --cloud-config=/etc/kubernetes/azure.json --v=2
     ExecStop=/usr/bin/docker stop -t 2 kubelet
-
     [Install]
     WantedBy=multi-user.target
 
