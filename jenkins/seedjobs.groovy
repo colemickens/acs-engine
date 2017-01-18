@@ -11,7 +11,9 @@ job("acs-engine/seedjob") {
 	scm {
 		git("${repo}", branch)
 	}
-
+	triggers {
+		cron("* * * * *")
+	}
 	steps {
 		dsl {
 			external('jenkins/seedjobs.groovy')
