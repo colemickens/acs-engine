@@ -9,9 +9,9 @@ folder(d) {
 }
 
 class JobDef {
-	string jobPrefix
-	string clusterDef
-	string orchestratorType
+	String jobPrefix
+	String clusterDef
+	String orchestratorType
 	Map extraEnv
 }
 
