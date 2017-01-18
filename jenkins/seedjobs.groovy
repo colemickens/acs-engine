@@ -74,6 +74,11 @@ jobzz.each {
 				githubPullRequest {
 					admins(githubAdmins)
 					cron("* * * * *")
+					extensions {
+						commitStatus {
+							completedStatus("SUCCESS", "Woot!")
+						}
+					}
 				}
 			}
 		}
