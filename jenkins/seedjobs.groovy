@@ -12,6 +12,7 @@ class JobDef {
 	String jobPrefix
 	String clusterDef
 	String orchestratorType
+	String[] locations
 	Map extraEnv
 }
 
