@@ -1,0 +1,2 @@
+- add KCM+magic.sh for SSL support
+- if we do that, might as well pre-configure the github auth too
