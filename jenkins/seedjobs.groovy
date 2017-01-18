@@ -9,7 +9,10 @@ folder("acs-engine") {
 
 job("acs-engine/seedjob") {
 	scm {
-		git("${repo}", branch)
+		git {
+			url("${repo}")
+			branch(branch)
+		}
 	}
 	triggers {
 		cron("* * * * *")
@@ -26,8 +29,9 @@ locations.each {
 	def location = it
 	def jobName = "acs-engine/${prefix}-${location}"
 	job(jobName) {
-		scm {
-			git("${repo}", branch)
+		git {
+			url("${repo}")
+			branch(branch)
 		}
 	}
 }
