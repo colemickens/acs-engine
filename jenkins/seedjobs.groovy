@@ -16,7 +16,7 @@ class JobDef {
 }
 
 jobzz = [
-	new JobDef{
+	new JobDef {
 		jobPrefix: "k8s-msi"
 		clusterDef: "examples/kubernetes.json"
 		orchestratorType: "kubernetes"
