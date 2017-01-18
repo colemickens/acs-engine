@@ -4,7 +4,7 @@ def branch = "master"
 def locations = ["westus", "eastus"]
 
 locations.each {
-	def location = it.name
+	def location = it
 	def jobName = "${prefix}-${location}"
 	job(jobName) {
 		scm {
