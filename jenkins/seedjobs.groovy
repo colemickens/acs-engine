@@ -30,9 +30,11 @@ jobzz = [
 
 job("acs-engine/seedjob") {
 	scm {
-		github {
-			repo(githubRepo)
-			credentials('colemickens_pat')
+		git {
+			remote {
+				github(githubRepo)
+				credentials('colemickens_pat')
+			}
 		}
 	}
 	triggers {
