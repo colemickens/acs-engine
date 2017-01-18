@@ -5,10 +5,10 @@ def locations = ["westus", "eastus"]
 
 // nest everything in jobs.
 // makes dev/test easier, can just wipe out jobs/ and leave seed job intact
-def d = "jobs/acs-engine"
-folder(d) {
-	description("Auto-generated Jenkins jobs for ACS-Engine")
-}
+// TODO: chris has script for this I think
+def d = "acs-engine/jobs"
+folder("acs-engine")
+folder(d)
 
 class JobDef {
 	String jobPrefix
