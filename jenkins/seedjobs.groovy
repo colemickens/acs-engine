@@ -36,7 +36,7 @@ job("acs-engine/seedjob") {
 		git {
 			remote {
 				github(githubRepo)
-				branch("colemickens-msi-jenkins")
+				branch("colemickens-msi-jenkins") // todo; why does branchNAme not work, always sets back to master?
 			}
 		}
 	}
@@ -50,7 +50,7 @@ job("acs-engine/seedjob") {
 		}
 	}
 }
-/*
+
 jobzz.each {
 	def j = it
 	j.locations.each {
@@ -79,4 +79,3 @@ jobzz.each {
 		}
 	}
 }
-*/
