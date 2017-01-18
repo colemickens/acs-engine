@@ -4,7 +4,7 @@ def branchName = "colemickens-msi-jenkins"
 def locations = ["westus", "eastus"]
 
 def githubCred = "github_pat"
-def githubAdmins = ["colemickens"]
+def githubAdmins = ['"colemickens',]
 
 // nest everything in jobs.
 // makes dev/test easier, can just wipe out jobs/ and leave seed job intact
