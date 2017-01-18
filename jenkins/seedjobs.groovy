@@ -36,8 +36,6 @@ job("acs-engine/seedjob") {
 		git {
 			remote {
 				github(githubRepo)
-				//admins(githubAdmins)
-				admin('colemickens')
 				refspec('+refs/pull/*:refs/remotes/origin/pr/*')
 				branch("master")
 			}
@@ -72,8 +70,7 @@ jobzz.each {
 			}
 			triggers {
 				githubPullRequest {
-					//admins(githubAdmins)
-					admin('colemickens')
+					admins(githubAdmins)
 					userWhitelist('cole.mickens@gmail.com')
 					cron("* * * * *")
 				}
