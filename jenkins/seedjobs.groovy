@@ -50,7 +50,7 @@ job("acs-engine/seedjob") {
 		}
 	}
 }
-
+/*
 jobzz.each {
 	def j = it
 	j.locations.each {
@@ -79,3 +79,4 @@ jobzz.each {
 		}
 	}
 }
+*/
