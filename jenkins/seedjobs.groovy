@@ -57,13 +57,6 @@ jobzz.each {
 		job(d2+"/"+jobName) {
 			scm {
 				github(repo)
-				git {
-					remote {
-						github(repo)
-						refspec('+refs/pull/*:refs/remotes/origin/pr/*')
-					}
-					branch("master")
-				}
 			}
 			triggers {
 				githubPullRequest {
