@@ -3,7 +3,9 @@ def repo = "https://github.com/colemickens/acs-engine"
 def branchName = "colemickens-msi-jenkins"
 def locations = ["westus", "eastus"]
 
-def d = "acs-engine"
+// nest everything in jobs.
+// makes dev/test easier, can just wipe out jobs/ and leave seed job intact
+def d = "jobs/acs-engine"
 folder(d) {
 	description("Auto-generated Jenkins jobs for ACS-Engine")
 }
