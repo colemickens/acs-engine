@@ -37,6 +37,8 @@ job("acs-engine/seedjob") {
 			remote {
 				github(githubRepo)
 				credentials(githubCred)
+				refspec('+refs/pull/*:refs/remotes/origin/pr/*')
+				branch("master")
 			}
 		}
 	}
