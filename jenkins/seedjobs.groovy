@@ -16,13 +16,13 @@ class JobDef {
 }
 
 jobzz = [
-	new JobDef {
-		jobPrefix: "k8s-msi"
-		clusterDef: "examples/kubernetes.json"
-		orchestratorType: "kubernetes"
-		locations: ["westus", "eastus"]
-		extraEnv: ["ENABLE_MSI":"true"]
-	},
+	new JobDef(
+		jobPrefix: "k8s-msi",
+		clusterDef: "examples/kubernetes.json",
+		orchestratorType: "kubernetes",
+		locations: ["westus", "eastus"],
+		extraEnv: ["ENABLE_MSI":"true"],
+	),
 ]
 
 job("acs-engine/seedjob") {
