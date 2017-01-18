@@ -4,7 +4,7 @@ def branchName = "colemickens-msi-jenkins"
 def locations = ["westus", "eastus"]
 
 def githubCred = "github_pat"
-def githubAdmins = ['"colemickens',]
+def githubAdmins = ['colemickens',]
 
 // nest everything in jobs.
 // makes dev/test easier, can just wipe out jobs/ and leave seed job intact
@@ -37,8 +37,8 @@ job("acs-engine/seedjob") {
 			remote {
 				github(githubRepo)
 				credentials(githubCred)
-				branch("colemickens-msi-jenkins") // todo; why does branchNAme not work, always sets back to master?
 			}
+			branch("colemickens-msi-jenkins") // todo; why does branchNAme not work, always sets back to master?
 		}
 	}
 	triggers {
@@ -65,15 +65,14 @@ jobzz.each {
 					remote {
 						github(githubRepo)
 						refspec('+refs/pull/*:refs/remotes/origin/pr/*')
-						branch("master")
 						credentials(githubCred)
 					}
+					branch("master")
 				}
 			}
 			triggers {
 				githubPullRequest {
 					admins(githubAdmins)
-					userWhitelist('cole.mickens@gmail.com')
 					cron("* * * * *")
 				}
 			}
