@@ -31,11 +31,13 @@ locations.each {
 	def location = it
 	def jobName = "acs-engine/${prefix}-${location}"
 	job(jobName) {
-		git {
-			remote {
-				url("${repo}")
+		scm {
+			git {
+				remote {
+					url("${repo}")
+				}
+				branch("${branch}")
 			}
-			branch("${branch}")
 		}
 	}
 }
