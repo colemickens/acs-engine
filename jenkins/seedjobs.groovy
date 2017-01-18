@@ -21,15 +21,23 @@ class JobDef {
 	Map extraEnv
 }
 
-jobzz = [
-	new JobDef(
+prJobs = [
+	/*new JobDef(
 		jobPrefix: "k8s-msi",
 		clusterDef: "examples/kubernetes.json",
 		orchestratorType: "kubernetes",
 		locations: ["westus", "eastus"],
 		extraEnv: ["ENABLE_MSI":"true"],
+	),*/
+	new JobDef(
+		jobPrefix: "k8s",
+		clusterDef: "examples/kubernetes.json",
+		orchestratorType: "kubernetes",
+		locations: ["westus2"],
+		extraEnv: [:],
 	),
 ]
+regularJobs = prJobs
 
 job("acs-engine/seedjob") {
 	scm {
@@ -38,7 +46,7 @@ job("acs-engine/seedjob") {
 				github(githubRepo)
 				credentials(githubCred)
 			}
-			branch("colemickens-msi-jenkins") // todo; why does branchNAme not work, always sets back to master?
+			branch(branchName)
 		}
 	}
 	triggers {
@@ -52,7 +60,30 @@ job("acs-engine/seedjob") {
 	}
 }
 
-jobzz.each {
+// Setup the "regular" jobs
+regularJobs.each {
+	def jobName = "${j.jobPrefix}-${location}"
+	job(d+"/"+jobName) {
+		scm {
+			git {
+				remote {
+					github(githubRepo)
+					refspec('+refs/pull/*:refs/remotes/origin/pr/*')
+					credentials(githubCred)
+				}
+				branch("master")
+			}
+		}
+		triggers {
+			// run it every two hours
+			// run it in response to any pushes to master
+		}
+	}
+}
+
+
+// Setup the PR jobs
+prJobs.each {
 	def j = it
 	j.locations.each {
 		def location = it
@@ -74,11 +105,11 @@ jobzz.each {
 				githubPullRequest {
 					admins(githubAdmins)
 					cron("* * * * *")
-					extensions {
+					/*extensions {
 						commitStatus {
 							completedStatus("SUCCESS", "Woot!")
 						}
-					}
+					}*/
 				}
 			}
 		}
