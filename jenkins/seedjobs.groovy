@@ -1,6 +1,6 @@
 def prefix = "acs-jenkins-msi"
 def repo = "https://github.com/colemickens/acs-engine"
-def branch = "colemickens-msi-jenkins"
+def branchName = "colemickens-msi-jenkins"
 def locations = ["westus", "eastus"]
 
 folder("acs-engine") {
@@ -13,7 +13,7 @@ job("acs-engine/seedjob") {
 			remote {
 				url(repo)
 			}
-			branch('test')
+			branch(branchName)
 		}
 	}
 	triggers {
@@ -36,7 +36,7 @@ locations.each {
 				remote {
 					url(repo)
 				}
-				branch(branch)
+				branch(branchName)
 			}
 		}
 	}
