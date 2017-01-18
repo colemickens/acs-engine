@@ -83,11 +83,12 @@ prJobs.each {
 				githubPullRequest {
 					admins(githubAdmins)
 					cron("* * * * *")
-					/*extensions {
-						commitStatus {
-							completedStatus("SUCCESS", "Woot!")
-						}
-					}*/
+					extensions {
+						commitStatus { addTestResults(false) }
+						//commitStatus {
+						//	completedStatus("SUCCESS", "Woot!")
+						//}
+					}
 				}
 			}
 		}
