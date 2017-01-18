@@ -1,6 +1,6 @@
 def prefix = "acs-jenkins-msi"
-def repo = "https://github.com/Azure/acs-engine"
-def branch = "master"
+def repo = "https://github.com/colemickens/acs-engine"
+def branch = "colemickens-msi-jenkins"
 def locations = ["westus", "eastus"]
 
 folder("acs-engine") {
