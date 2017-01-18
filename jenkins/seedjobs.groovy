@@ -58,7 +58,7 @@ jobzz.each {
 			scm {
 				github {
 					repo(repo)
-					credentials(colemickens_pat)
+					credentials('colemickens_pat')
 				}
 			}
 			triggers {
