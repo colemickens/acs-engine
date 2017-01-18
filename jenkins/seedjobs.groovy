@@ -13,7 +13,6 @@ job("acs-engine/seedjob") {
 			remote {
 				url(repo)
 			}
-			branch('test')
 		}
 	}
 	triggers {
