@@ -36,7 +36,7 @@ job("acs-engine/seedjob") {
 		git {
 			remote {
 				github(githubRepo)
-				branch(branchName)
+				branch("colemickens-msi-jenkins")
 			}
 		}
 	}
