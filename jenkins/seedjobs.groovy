@@ -4,7 +4,7 @@ def branch = "master"
 def locations = ["westus", "eastus"]
 
 folder("acs-engine") {
-	description("Auto-generated Jenkins jobs for ACS-Engine"
+	description("Auto-generated Jenkins jobs for ACS-Engine")
 }
 
 job("acs-engine/seedjob") {
