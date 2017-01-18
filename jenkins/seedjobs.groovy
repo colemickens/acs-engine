@@ -36,8 +36,7 @@ job("acs-engine/seedjob") {
 		git {
 			remote {
 				github(githubRepo)
-				refspec('+refs/pull/*:refs/remotes/origin/pr/*')
-				branch("master")
+				branch(branchName)
 			}
 		}
 	}
@@ -64,6 +63,8 @@ jobzz.each {
 				git {
 					remote {
 						github(githubRepo)
+						refspec('+refs/pull/*:refs/remotes/origin/pr/*')
+						branch("master")
 						credentials(githubCred)
 					}
 				}
