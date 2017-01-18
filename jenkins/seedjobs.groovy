@@ -1,4 +1,4 @@
-def githubRepo = "https://github.com/colemickens/acs-engine"
+def githubRepo = "colemickens/acs-engine"
 def repoUrl = "https://github.com/colemickens/acs-engine"
 def branchName = "colemickens-msi-jenkins"
 def locations = ["westus", "eastus"]
