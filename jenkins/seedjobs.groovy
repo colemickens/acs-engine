@@ -60,28 +60,6 @@ job("acs-engine/seedjob") {
 	}
 }
 
-// Setup the "regular" jobs
-regularJobs.each {
-	def jobName = "${j.jobPrefix}-${location}"
-	job(d+"/"+jobName) {
-		scm {
-			git {
-				remote {
-					github(githubRepo)
-					refspec('+refs/pull/*:refs/remotes/origin/pr/*')
-					credentials(githubCred)
-				}
-				branch("master")
-			}
-		}
-		triggers {
-			// run it every two hours
-			// run it in response to any pushes to master
-		}
-	}
-}
-
-
 // Setup the PR jobs
 prJobs.each {
 	def j = it
