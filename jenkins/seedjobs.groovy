@@ -3,7 +3,7 @@ def repoUrl = "https://github.com/colemickens/acs-engine"
 def branchName = "colemickens-msi-jenkins"
 def locations = ["westus", "eastus"]
 
-def githubCred = "colemickens_pat"
+def githubCred = "github_pat"
 
 // nest everything in jobs.
 // makes dev/test easier, can just wipe out jobs/ and leave seed job intact
