@@ -36,6 +36,7 @@ job("acs-engine/seedjob") {
 		git {
 			remote {
 				github(githubRepo)
+				credentials(githubCred)
 				branch("colemickens-msi-jenkins") // todo; why does branchNAme not work, always sets back to master?
 			}
 		}
