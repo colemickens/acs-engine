@@ -32,7 +32,6 @@ job("acs-engine/seedjob") {
 	scm {
 		github {
 			repo(githubRepo)
-			branch(branchName)
 			credentials('colemickens_pat')
 		}
 	}
