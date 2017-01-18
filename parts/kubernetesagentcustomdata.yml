@@ -80,35 +80,7 @@ write_files:
     ExecStartPre=/bin/mkdir -p /var/lib/kubelet
     ExecStartPre=/bin/mount --bind /var/lib/kubelet /var/lib/kubelet
     ExecStartPre=/bin/mount --make-shared /var/lib/kubelet
-    ExecStart=/usr/bin/docker run \
-      --net=host \
-      --pid=host \
-      --privileged \
-      --volume=/dev:/dev \
-      --volume=/sys:/sys:ro \
-      --volume=/var/run:/var/run:rw \
-      --volume=/var/lib/docker/:/var/lib/docker:rw \
-      --volume=/var/lib/kubelet/:/var/lib/kubelet:shared \
-      --volume=/var/log:/var/log:rw \
-      --volume=/etc/kubernetes/:/etc/kubernetes/:ro \
-      --volume=/srv/kubernetes/:/srv/kubernetes/:ro \
-        {{{kubernetesHyperkubeSpec}}} \
-          /hyperkube kubelet \
-            --api-servers="https://{{{masterPrivateIp}}}:443" \
-            --kubeconfig=/var/lib/kubelet/kubeconfig \
-            --address=0.0.0.0 \
-            --allow-privileged=true \
-            --enable-server \
-            --enable-debugging-handlers \
-            --config=/etc/kubernetes/manifests \
-            --cluster-dns={{{kubeDnsServiceIP}}} \
-            --cluster-domain=cluster.local \
-            --cloud-provider=azure \
-            --cloud-config=/etc/kubernetes/azure.json \
-            --hairpin-mode=promiscuous-bridge \
-            --network-plugin=kubenet \
-            --reconcile-cidr \
-            --v=2
+    ExecStart=/usr/bin/docker run --net=host --pid=host --privileged --volume=/dev:/dev --volume=/sys:/sys:ro --volume=/var/run:/var/run:rw --volume=/var/lib/docker/:/var/lib/docker:rw --volume=/var/lib/kubelet/:/var/lib/kubelet:shared --volume=/var/log:/var/log:rw --volume=/etc/kubernetes/:/etc/kubernetes/:ro --volume=/srv/kubernetes/:/srv/kubernetes/:ro --volume=/var/lib/waagent/ManagedIdentity-Settings:/var/lib/waagent/ManagedIdentity-Settings:ro {{{kubernetesHyperkubeSpec}}} /hyperkube kubelet --api-servers="https://{{{masterPrivateIp}}}:443" --kubeconfig=/var/lib/kubelet/kubeconfig --address=0.0.0.0 --allow-privileged=true --enable-server --enable-debugging-handlers --pod-manifest-path=/etc/kubernetes/manifests --cluster-dns={{{kubeDnsServiceIP}}} --cluster-domain=cluster.local --cloud-provider=azure --cloud-config=/etc/kubernetes/azure.json --hairpin-mode=promiscuous-bridge --network-plugin=kubenet --reconcile-cidr --v=2
     ExecStop=/usr/bin/docker stop -t 2 kubelet
 
     [Install]
