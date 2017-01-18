@@ -1,4 +1,5 @@
-def repo = "https://github.com/colemickens/acs-engine"
+def githubRepo = "https://github.com/colemickens/acs-engine"
+def repoUrl = "https://github.com/colemickens/acs-engine"
 def branchName = "colemickens-msi-jenkins"
 def locations = ["westus", "eastus"]
 
@@ -29,11 +30,10 @@ jobzz = [
 
 job("acs-engine/seedjob") {
 	scm {
-		git {
-			remote {
-				url(repo)
-			}
+		github {
+			repo(githubRepo)
 			branch(branchName)
+			credentials('colemickens_pat')
 		}
 	}
 	triggers {
@@ -57,7 +57,7 @@ jobzz.each {
 		job(d2+"/"+jobName) {
 			scm {
 				github {
-					repo(repo)
+					repo(githubRepo)
 					credentials('colemickens_pat')
 				}
 			}
