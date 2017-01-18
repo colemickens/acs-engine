@@ -57,8 +57,8 @@ jobzz.each {
 		folder(d2)
 		job(d2+"/"+jobName) {
 			scm {
-				github {
-					repo(githubRepo)
+				remote {
+					github(githubRepo)
 					credentials('colemickens_pat')
 				}
 			}
