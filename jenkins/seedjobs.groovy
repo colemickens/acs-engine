@@ -52,10 +52,14 @@ jobzz.each {
 		def location = it
 		def jobName = "${j.jobPrefix}-${location}"
 		job(d+"/pr_"+jobName) {
-			scm { git { remote { url(repo) } branch(branchName) } }
-		}
-		job(d+"/"+jobName) {
-			scm { git { remote { url(repo) } branch(branchName) } }
+			scm {
+				git {
+					remote {
+						url(repo)
+					}
+					branch(branchName)
+				}
+			}
 		}
 	}
 }
