@@ -55,13 +55,21 @@ jobzz.each {
 		def jobName = "${j.jobPrefix}-${location}"
 		d2=d+"/pullrequests"
 		folder(d2)
-		job(d2+"/pr_"+jobName) {
+		job(d2+"/"+jobName) {
 			scm {
 				git {
 					remote {
 						url(repo)
 					}
 					branch(branchName)
+				}
+			}
+			triggers {
+				githubPullRequest {
+					admin('colemickens')
+					userWhitelist('cole.mickens@gmail.com')
+					triggerPhrase("OK to test")
+					cron("* * * * *")
 				}
 			}
 		}
