@@ -10,7 +10,9 @@ folder("acs-engine") {
 job("acs-engine/seedjob") {
 	scm {
 		git {
-			url("${repo}")
+			remote {
+				url("${repo}")
+			}
 			branch(branch)
 		}
 	}
@@ -30,7 +32,9 @@ locations.each {
 	def jobName = "acs-engine/${prefix}-${location}"
 	job(jobName) {
 		git {
-			url("${repo}")
+			remote {
+				url("${repo}")
+			}
 			branch(branch)
 		}
 	}
