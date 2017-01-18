@@ -1,0 +1,123 @@
+# Copyright 2015 Google Inc. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: jenkins
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+  name: slow
+provisioner: kubernetes.io/azure-disk
+parameters:
+  skuName: Standard_LRS
+---
+apiVersion: "v1"
+kind: "PersistentVolumeClaim"
+metadata:
+  name: "jenkins-pv"
+  namespace: "jenkins"
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "slow"
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "10Gi"
+---
+# [START jenkins_deployment]
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: jenkins
+  namespace: jenkins
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: master
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+      - name: proxy
+        image: gcr.io/google_containers/kubectl-amd64:v1.5.2
+        command:
+        - proxy
+      containers:
+      - name: master
+        image: jenkins:2.32.1
+#        image: jenkins:2.7.2
+        ports:
+        - containerPort: 8080
+        - containerPort: 50000
+#        readinessProbe:
+#          httpGet:
+#            path: /login
+#            port: 8080
+#          periodSeconds: 10
+#          timeoutSeconds: 5
+#          successThreshold: 2
+#          failureThreshold: 5
+        env:
+        - name: JAVA_OPTS
+          value: "-Djenkins.install.runSetupWizard=false"
+        - name: JENKINS_OPTS
+          valueFrom:
+            secretKeyRef:
+              name: jenkins
+              key: options
+        volumeMounts:
+        - mountPath: /var/jenkins_home
+          name: jenkins-home
+        resources:
+          limits:
+            cpu: 500m
+            memory: 4000Mi
+          requests:
+            cpu: 500m
+            memory: 4000Mi
+      volumes:
+      - name: jenkins-home
+#        hostPath:
+#          path: /var/lib/jenkins
+        persistentVolumeClaim:
+          claimName: jenkins-pv
+# [END jenkins_deployment]
+# [START jenkins_service_ui]
+---
+  kind: Service
+  apiVersion: v1
+  metadata:
+    name: jenkins
+    namespace: jenkins
+  spec:
+    #type: NodePort
+    type: LoadBalancer
+    selector:
+      app: master
+    ports:
+      - protocol: TCP
+        port: 8080
+        targetPort: 8080
+        name: ui
+      - protocol: TCP
+        port: 50000
+        targetPort: 50000
+        name: slaves
+# [END jenkins_service_discovery]
