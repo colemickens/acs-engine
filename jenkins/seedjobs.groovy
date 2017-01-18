@@ -12,8 +12,8 @@ job("acs-engine/seedjob") {
 		git {
 			remote {
 				url(repo)
-				branch(branch)
 			}
+			branch('test')
 		}
 	}
 	triggers {
@@ -35,8 +35,8 @@ locations.each {
 			git {
 				remote {
 					url(repo)
-					branch(branch)
 				}
+				branch(branch)
 			}
 		}
 	}
