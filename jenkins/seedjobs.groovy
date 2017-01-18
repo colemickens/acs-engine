@@ -53,7 +53,7 @@ jobzz.each {
 	j.locations.each {
 		def location = it
 		def jobName = "${j.jobPrefix}-${location}"
-		d2=d+"pullrequests"
+		d2=d+"/pullrequests"
 		folder(d2)
 		job(d2+"/pr_"+jobName) {
 			scm {
