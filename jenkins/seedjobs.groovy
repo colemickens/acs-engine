@@ -11,9 +11,9 @@ job("acs-engine/seedjob") {
 	scm {
 		git {
 			remote {
-				url("${repo}")
+				url(repo)
 			}
-			//branch("${branch}")
+			branch("${branch}")
 		}
 	}
 	triggers {
