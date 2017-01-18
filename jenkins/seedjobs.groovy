@@ -1,4 +1,4 @@
-def repo = "colemickens/acs-engine"
+def repo = "https://github.com/colemickens/acs-engine"
 def branchName = "colemickens-msi-jenkins"
 def locations = ["westus", "eastus"]
 
