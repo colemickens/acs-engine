@@ -3,6 +3,10 @@ def repo = "https://github.com/Azure/acs-engine"
 def branch = "master"
 def locations = ["westus", "eastus"]
 
+folder("acs-engine") {
+	description("Auto-generated Jenkins jobs for ACS-Engine"
+}
+
 job("acs-engine/seedjob") {
 	scm {
 		git("${repo}", branch)
