@@ -65,12 +65,12 @@ jobzz.each {
 				}
 			}
 			triggers {
-				/*githubPullRequest {
+				githubPullRequest {
 					admin('colemickens')
 					userWhitelist('cole.mickens@gmail.com')
 					triggerPhrase("OK to test")
 					cron("* * * * *")
-				}*/
+				}
 			}
 		}
 	}
