@@ -1,7 +1,7 @@
 def prefix = "acs-jenkins-msi"
 def repo = "github.com/Azure/acs-engine"
 def branch = "master"
-def locations = ("westus", "eastus")
+def locations = ["westus", "eastus"]
 
 locations.each {
 	def location = it.name

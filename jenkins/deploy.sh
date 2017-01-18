@@ -56,11 +56,9 @@ function cli() {
 }
 
 
-envsubst<"${DIR}/init.groovy" >"${WORKDIR}/init.groovy"
-cli groovy "${WORKDIR}/init.groovy"
+#envsubst<"${DIR}/init.groovy" >"${WORKDIR}/init.groovy"
+#cli groovy "${WORKDIR}/init.groovy"
 
-
-exit 0
 
 # Add secrets
 #foreach cred in "${DIR}/creds"; do
