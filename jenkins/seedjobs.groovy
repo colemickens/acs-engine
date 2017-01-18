@@ -56,7 +56,10 @@ jobzz.each {
 		folder(d2)
 		job(d2+"/"+jobName) {
 			scm {
-				github(repo)
+				github {
+					repo(repo)
+					credentials(colemickens_pat)
+				}
 			}
 			triggers {
 				githubPullRequest {
