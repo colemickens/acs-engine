@@ -1,11 +1,29 @@
-def prefix = "acs-jenkins-msi"
+def prefix = "j-"
 def repo = "https://github.com/colemickens/acs-engine"
 def branchName = "colemickens-msi-jenkins"
 def locations = ["westus", "eastus"]
 
-folder("acs-engine") {
+def d = "acs-engine"
+folder(d) {
 	description("Auto-generated Jenkins jobs for ACS-Engine")
 }
+
+class JobDef {
+	string jobPrefix
+	string clusterDef
+	string orchestratorType
+	Map extraEnv
+}
+
+jobzz = [
+	new JobDef{
+		jobPrefix: "k8s-msi"
+		clusterDef: "examples/kubernetes.json"
+		orchestratorType: "kubernetes"
+		locations: ["westus", "eastus"]
+		extraEnv: ["ENABLE_MSI":"true"]
+	},
+]
 
 job("acs-engine/seedjob") {
 	scm {
@@ -27,17 +45,16 @@ job("acs-engine/seedjob") {
 	}
 }
 
-locations.each {
-	def location = it
-	def jobName = "acs-engine/${prefix}-${location}"
-	job(jobName) {
-		scm {
-			git {
-				remote {
-					url(repo)
-				}
-				branch(branchName)
-			}
+jobzz.each {
+	def j = it
+	j.locations.each {
+		def location = it
+		def jobName = "${j.jobPrefix}-${location}"
+		job(d+"/pr_"+jobName) {
+			scm { git { remote { url(repo) } branch(branchName) } }
+		}
+		job(d+"/"+jobName) {
+			scm { git { remote { url(repo) } branch(branchName) } }
 		}
 	}
 }
