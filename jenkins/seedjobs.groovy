@@ -1,5 +1,4 @@
-def prefix = "j-"
-def repo = "https://github.com/colemickens/acs-engine"
+def repo = "colemickens/acs-engine"
 def branchName = "colemickens-msi-jenkins"
 def locations = ["westus", "eastus"]
 
@@ -57,18 +56,19 @@ jobzz.each {
 		folder(d2)
 		job(d2+"/"+jobName) {
 			scm {
+				github(repo)
 				git {
 					remote {
-						url(repo)
+						github(repo)
+						refspec('+refs/pull/*:refs/remotes/origin/pr/*')
 					}
-					branch(branchName)
+					branch("master")
 				}
 			}
 			triggers {
 				githubPullRequest {
 					admin('colemickens')
 					userWhitelist('cole.mickens@gmail.com')
-					triggerPhrase("OK to test")
 					cron("* * * * *")
 				}
 			}

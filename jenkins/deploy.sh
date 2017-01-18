@@ -71,6 +71,10 @@ function cli() {
 # Install plugins
 # (this comes last because it restarts and not sure if CLI blocks for
 #  restart to finish)
+
+#	// ghprbuilder
+# github-pullrequest
+
 cli install-plugin \
 	ansicolor \
 	blueocean \
