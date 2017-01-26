@@ -13,20 +13,16 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 set -eu -o pipefail
 set -x
 
-env
+env; printf "\n\n"
 
-git clone git@github.com:colemickens/acs-engine.git
-git checkout colemickens-test-prep
-make
-./test/deploy-k8s.sh
-
-exit 0
-
-git init k8s.io/test-infra --separate-git-dir=/root/.cache/git/k8s.io/test-infra
+git init acs-engine --separate-git-dir="/root/.cache/git/acs-engine"
 git clean -dfx
 git reset --hard
-git config --local user.name 'K8S Bootstrap'
-git config --local user.email k8s_bootstrap@localhost
-git fetch --tags https://github.com/kubernetes/test-infra master 
-git checkout -B test 00515c8e737a4ca2479bd734521d3c0e7080a12d
-git merge --no-ff -m 'Merge +refs/pull/1719/head:refs/pr/1719' 
+git config --local user.name 'ACS Bot'
+git config --local user.email 'acs-bot@microsoft.com'
+git fetch --tags https://github.com/${REPO_OWNER}/${REPO_NAME} master 
+git checkout -B test "${PULL_PULL_SHA}"
+git merge --no-ff -m "Merge +refs/pull/${PULL_NUMBER}/head:refs/pr/${PULL_NUMBER}"
+
+make
+./test/deploy-k8s.sh
