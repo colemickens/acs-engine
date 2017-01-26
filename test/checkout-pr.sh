@@ -15,11 +15,14 @@ set -x
 
 env; printf "\n\n"
 
-git init acs-engine --separate-git-dir="/root/.cache/git/acs-engine"
+
+#mkdir -p "/root/.cache/git"
+#git init acs-engine --separate-git-dir="/root/.cache/git/acs-engine"
+git init .
 git clean -dfx
 git reset --hard
 git config --local user.name 'ACS Bot'
 git config --local user.email 'acs-bot@microsoft.com'
-git fetch --tags https://github.com/${REPO_OWNER}/${REPO_NAME} master 
-git checkout -B test "${PULL_PULL_SHA}"
-git merge --no-ff -m "Merge +refs/pull/${PULL_NUMBER}/head:refs/pr/${PULL_NUMBER}"
+git fetch --tags https://github.com/${REPO_OWNER}/${REPO_NAME} master +refs/pull/${PULL_NUMBER}/head:refs/pr/${PULL_NUMBER}
+git checkout -B test "${PULL_BASE_SHA}"
+git merge --no-ff -m "Merge +refs/pull/${PULL_NUMBER}/head:refs/pr/${PULL_NUMBER}" "${PULL_PULL_SHA}"
