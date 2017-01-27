@@ -103,7 +103,7 @@ function deploy() {
 		--template-file "${OUTPUT}/azuredeploy.json" \
 		--parameters "@${OUTPUT}/azuredeploy.parameters.json"
 
-	execcho az group deployment wait \
+	execho az group deployment wait \
 		--name "${INSTANCE_NAME}" \
 		--resource-group "${INSTANCE_NAME}"
 
