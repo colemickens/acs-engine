@@ -2,11 +2,14 @@
 
 # exit on errors
 set -e
+# exit on unbound variables
+set -u
 # verbose logging
 set -x
 
-EXPECTED_NODE_COUNT=4
-EXPECTED_DNS=2
+EXPECTED_NODE_COUNT="${EXPECTED_NODE_COUNT:-4}"
+EXPECTED_DNS="${EXPECTED_DNS:-2}"
+EXPECTED_DASHBOARD="${EXPECTED_DASHBOARD:-1}"
 
 namespace="namespace-${RANDOM}"
 echo "Running test in namespace: ${namespace}"
@@ -16,7 +19,6 @@ function teardown {
   kubectl delete namespaces ${namespace}
 }
 
-
 echo "Testing number of nodes is ${EXPECTED_NODE_COUNT}"
 node_count=$(kubectl get nodes --no-headers | wc | awk '{print $1}')
 if [[ ${node_count} != ${EXPECTED_NODE_COUNT} ]]; then
@@ -25,10 +27,30 @@ if [[ ${node_count} != ${EXPECTED_NODE_COUNT} ]]; then
   exit 1
 fi
 
+# loop for two minutes or until no ContainerCreating messages
+count=0
+while [[ ${count} < 20 ]]; do
+  echo "Waiting for Pods to all leave ContainerCreating"
+  creating=$(kubectl get pods --namespace=${kube-system} | grep ContainerCreating | wc | awk '{print $1}')
+  if [[ ${creating} == 0 ]]; then
+    break
+  fi
+  count=(count+1)
+  sleep 5
+done
+
 echo "Testing system tools are running"
 running=$(kubectl get pods --namespace=kube-system | grep kube-dns | grep Running | wc | awk '{print $1}')
 if [[ ${running} != ${EXPECTED_DNS} ]]; then
   echo "Unexpected number of DNS servers: ${running}"
+  kubectl get pods --namespace=kube-system
+  exit 1
+fi
+
+echo "Testing system tools are running"
+running=$(kubectl get pods --namespace=kube-system | grep kubernetes-dashboard | grep Running | wc | awk '{print $1}')
+if [[ ${running} != ${EXPECTED_DASHBOARD} ]]; then
+  echo "Unexpected number of DASHBOARD servers: ${running}"
   kubectl get pods --namespace=kube-system
   exit 1
 fi
