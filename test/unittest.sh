@@ -15,18 +15,7 @@ set -u
 set -o pipefail
 
 ROOT="${DIR}/.."
-
-cd "${ROOT}"
-make
-
 source "${ROOT}/test/common.sh"
 
-export INSTANCE_NAME_DEFAULT="${INSTANCE_NAME_PREFIX}-$(printf "%x" $(date '+%s'))-${LOCATION}"
-export INSTANCE_NAME="${INSTANCE_NAME:-${INSTANCE_NAME_DEFAULT}}"
-export CLUSTER_DEFINITION="${ROOT}/examples/kubernetes.json"
-
-# MSI needs to overwrite this
-export CLUSTER_SERVICE_PRINCIPAL_CLIENT_ID="${CLUSTER_SERVICE_PRINCIPAL_CLIENT_ID:-SERVICE_PRINCIPAL_CLIENT_ID}"
-export CLUSTER_SERVICE_PRINCIPAL_CLIENT_SECRET="${CLUSTER_SERVICE_PRINCIPAL_CLIENT_ID:-SERVICE_PRINCIPAL_CLIENT_ID}"
-
-deploy
+make -C "${ROOT}"
+make -C "${ROOT}" ci
