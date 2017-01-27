@@ -19,16 +19,24 @@ function teardown {
   kubectl delete namespaces ${namespace}
 }
 
-echo "Testing number of nodes is ${EXPECTED_NODE_COUNT}"
-node_count=$(kubectl get nodes --no-headers | wc | awk '{print $1}')
-if [[ ${node_count} != ${EXPECTED_NODE_COUNT} ]]; then
-  echo "Unexpected nodes: ${node_count}"
-  kubectl get nodes
-  exit 1
-fi
-
-# loop for two minutes or until no ContainerCreating messages
 count=0
+
+while [[ true ]]; do
+  echo "Testing number of nodes is ${EXPECTED_NODE_COUNT}"
+  node_count=$(kubectl get nodes --no-headers | wc | awk '{print $1}')
+  if [[ ${node_count} == ${EXPECTED_NODE_COUNT} ]]; then
+    break;
+  fi
+  count=(count+1)
+  if [[ ${count} > 24 ]]; then
+    echo "gave up on waiting for nodes (or any api connectivity)"
+    exit -1
+  fi
+  sleep 5
+done
+
+
+count=0;
 while [[ ${count} < 20 ]]; do
   echo "Waiting for Pods to all leave ContainerCreating"
   creating=$(kubectl get pods --namespace=${kube-system} | grep ContainerCreating | wc | awk '{print $1}')
