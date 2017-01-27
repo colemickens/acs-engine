@@ -80,24 +80,33 @@ function deploy() {
 	fi
 
 	# Login to Azure-Cli
+	set +x
 	az login --service-principal \
 		--username "${SERVICE_PRINCIPAL_CLIENT_ID}" \
 		--password "${SERVICE_PRINCIPAL_CLIENT_SECRET}" \
-		--tenant "${TENANT_ID}"
+		--tenant "${TENANT_ID}" &>/dev/null
 
 	az account set --subscription "${SUBSCRIPTION_ID}"
+	set -x
 
 	# Deploy the template
-	az group create --name="${INSTANCE_NAME}" --location="${LOCATION}"
+	rgoutput=$(az group create --name="${INSTANCE_NAME}" --location="${LOCATION}")
+	set +x
+	echo "${rgoutput}" | sed "s/${SUBSCRIPTION_ID}/xxx/g"
+	set -x
+
+
 	sleep 3 # TODO: investigate why this is needed (eventual consistency in ARM)
-	az group deployment create \
+	rgoutput=$(az group deployment create \
 		--name "${INSTANCE_NAME}" \
 		--resource-group "${INSTANCE_NAME}" \
 		--template-file "${OUTPUT}/azuredeploy.json" \
-		--parameters "@${OUTPUT}/azuredeploy.parameters.json" \
-			2>&1 | tee "${OUTPUT}/deployment-debug.log"
+		--parameters "@${OUTPUT}/azuredeploy.parameters.json")
+	set +x
+	echo "${rgoutput}" | sed "s/${SUBSCRIPTION_ID}/xxx/g"
+	set -x
 
-	echo "OUTPUT DIR WITH GOODIES (like SSH key): ${OUTPUT}"
+	echo "${INSTANCE_NAME} files -> ${OUTPUT}"
 }
 
 function cleanup() {
