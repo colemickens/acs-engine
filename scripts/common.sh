@@ -97,15 +97,10 @@ function deploy() {
 
 	sleep 3 # TODO: investigate why this is needed (eventual consistency in ARM)
 	execho az group deployment create \
-		--no-wait \
 		--name "${INSTANCE_NAME}" \
 		--resource-group "${INSTANCE_NAME}" \
 		--template-file "${OUTPUT}/azuredeploy.json" \
 		--parameters "@${OUTPUT}/azuredeploy.parameters.json"
-
-	execho az group deployment wait \
-		--name "${INSTANCE_NAME}" \
-		--resource-group "${INSTANCE_NAME}"
 
 	echo "${INSTANCE_NAME} files -> ${OUTPUT}"
 }
