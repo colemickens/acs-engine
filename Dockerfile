@@ -25,6 +25,6 @@ RUN go get -u github.com/golang/lint/golint
 RUN go get -u github.com/jteeuwen/go-bindata/...
 
 # Used for CI purposes TODO imrpove comment
-ADD ./test/checkout-pr.sh /tmp/checkout-pr.sh
+ADD ./test/bootstrap/checkout-pr.sh /tmp/checkout-pr.sh
 
 WORKDIR /gopath/src/github.com/Azure/acs-engine
