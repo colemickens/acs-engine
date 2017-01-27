@@ -14,8 +14,16 @@ set -e
 set -u
 set -o pipefail
 
-ROOT="${DIR}"
-source "${ROOT}/test/common.sh"
+ROOT="${DIR}/.."
+source "${ROOT}/scripts/common.sh"
+
+# Ensure CLUSTER_TYPE if VALIDATE is set
+if [[ "${VALIDATE:-}" == "y" ]]; then
+	if [[ -z "${CLUSTER_TYPE:-}" ]]; then
+		echo "you must specify CLUSTER_TYPE when VALIDATE=y"
+		exit -1
+	fi
+fi
 
 # Load any user set environment
 if [[ -f "${ROOT}/test/user.env" ]]; then
@@ -29,7 +37,7 @@ if [[ -z "${CLUSTER_DEFINITION}" ]]; then
 fi
 
 # Set Instance Name for PR or random run
-if [[ -z "${PULL_NUMBER}" ]]; then
+if [[ ! -z "${PULL_NUMBER:-}" ]]; then
 	export INSTANCE_NAME="${JOB_NAME}"
 else
 	export INSTANCE_NAME_DEFAULT="${INSTANCE_NAME_PREFIX}-$(printf "%x" $(date '+%s'))-${LOCATION}"
@@ -39,9 +47,9 @@ fi
 make -C "${ROOT}"
 deploy
 
-if [[ ! "${VALIDATE}" ~= "Yy" ]]; then
+if [[ "${VALIDATE:-}" != "y" ]]; then
 	exit 0
-fi 
+fi
 
 if [[ "${CLUSTER_TYPE}" == "kubernetes" ]]; then
 	export KUBECONFIG="${ROOT}/_output/${INSTANCE_NAME}/kubeconfig/kubeconfig.${LOCATION}.json"
