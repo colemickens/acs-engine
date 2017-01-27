@@ -38,7 +38,7 @@ fi
 
 # Set Instance Name for PR or random run
 if [[ ! -z "${PULL_NUMBER:-}" ]]; then
-	export INSTANCE_NAME="${JOB_NAME}-${PULL_NUMBER}-$(printf "%x" $(date '+%s'))-$(LOCATION)"
+	export INSTANCE_NAME="${JOB_NAME}-${PULL_NUMBER}-$(printf "%x" $(date '+%s'))-${LOCATION}"
 else
 	export INSTANCE_NAME_DEFAULT="${INSTANCE_NAME_PREFIX}-$(printf "%x" $(date '+%s'))-${LOCATION}"
 	export INSTANCE_NAME="${INSTANCE_NAME:-${INSTANCE_NAME_DEFAULT}}"
