@@ -59,7 +59,6 @@ function deploy() {
 
 	# Form the final cluster_definition file
 	# TODO: replace with simple sed and remove jq -i
-	DNS_PREFIX=${} # truncate to 45 (max dns name)
 	export FINAL_CLUSTER_DEFINITION="${OUTPUT}/clusterdefinition.json"
 	cp "${CLUSTER_DEFINITION}" "${FINAL_CLUSTER_DEFINITION}"
 	jqi "${FINAL_CLUSTER_DEFINITION}" ".properties.masterProfile.dnsPrefix = \"${INSTANCE_NAME}\""
@@ -93,18 +92,23 @@ function deploy() {
 	# Deploy the template
 	rgoutput=$(az group create --name="${INSTANCE_NAME}" --location="${LOCATION}")
 	set +x
-	echo "${rgoutput}" | sed "s/${SUBSCRIPTION_ID}/xxx/g"
+	echo "${rgoutput}" | sed "s/${SUBSCRIPTION_ID}/00000000-0000-0000-0000-000000000000/g"
 	set -x
 
 
+	# TODO: see if we can no-wait here, print, and then wait
 	sleep 3 # TODO: investigate why this is needed (eventual consistency in ARM)
-	rgoutput=$(az group deployment create \
+	az group deployment create \
 		--name "${INSTANCE_NAME}" \
 		--resource-group "${INSTANCE_NAME}" \
 		--template-file "${OUTPUT}/azuredeploy.json" \
-		--parameters "@${OUTPUT}/azuredeploy.parameters.json")
+		--parameters "@${OUTPUT}/azuredeploy.parameters.json"
+
+	rgoutput="$(az group deployment wait \
+		--name "${INSTANCE_NAME}" \
+		--resource-group "${INSTANCE_NAME}")"
 	set +x
-	echo "${rgoutput}" | sed "s/${SUBSCRIPTION_ID}/xxx/g"
+	echo "${rgoutput}" | sed "s/${SUBSCRIPTION_ID}/00000000-0000-0000-0000-000000000000/g"
 	set -x
 
 	echo "${INSTANCE_NAME} files -> ${OUTPUT}"
