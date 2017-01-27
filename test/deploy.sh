@@ -15,7 +15,29 @@ set -u
 set -o pipefail
 
 ROOT="${DIR}/.."
-source "${ROOT}/scripts/common.sh"
+source "${ROOT}/test/common.sh"
+
+# Usage:
+#
+# Manual user usage (Specific name):
+#   export INSTANCE_NAME=official-jenkins-infra
+#   ./scripts/deploy.sh ./examples/kubernetes.json
+#
+# Manual user usage (Lots of rapid fire):
+# In this mode, the user can repeat the same deploy
+# command blindly and get new clusters each time.
+#   unset INSTANCE_NAME
+#   vim ./test/user.env (add your stuff)
+#   ./scripts/deploy.sh ./examples.kubernetes.json
+#   sleep 1
+#   ./scripts/deploy.sh ./examples.kubernetes.json
+#
+# Prow:
+#   export PULL_NUMBER=...
+#   export VALIDATE=true
+#   export CLUSTER_DEFIITION=examples/kubernetes.json
+#   export CLUSTER_TYPE=kubernetes
+#   ./scripts/deploy.sh
 
 # Ensure CLUSTER_TYPE if VALIDATE is set
 if [[ "${VALIDATE:-}" == "y" ]]; then
