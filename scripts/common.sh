@@ -59,6 +59,7 @@ function deploy() {
 
 	# Form the final cluster_definition file
 	# TODO: replace with simple sed and remove jq -i
+	DNS_PREFIX=${} # truncate to 45 (max dns name)
 	export FINAL_CLUSTER_DEFINITION="${OUTPUT}/clusterdefinition.json"
 	cp "${CLUSTER_DEFINITION}" "${FINAL_CLUSTER_DEFINITION}"
 	jqi "${FINAL_CLUSTER_DEFINITION}" ".properties.masterProfile.dnsPrefix = \"${INSTANCE_NAME}\""
