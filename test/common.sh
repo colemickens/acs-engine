@@ -13,6 +13,8 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 set -eu -o pipefail
 set -x
 
+ROOT="${DIR}/.."
+
 # see: https://github.com/stedolan/jq/issues/105
 # and: https://github.com/stedolan/jq/wiki/FAQ#general-questions
 function jqi() {
