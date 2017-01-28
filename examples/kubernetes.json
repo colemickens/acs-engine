@@ -6,7 +6,7 @@
     },
     "masterProfile": {
       "count": 1,
-      "dnsPrefix": "",
+      "dnsPrefix": "__DNS_PREFIX__",
       "vmSize": "Standard_D2_v2"
     },
     "agentPoolProfiles": [
@@ -22,14 +22,14 @@
       "ssh": {
         "publicKeys": [
           {
-            "keyData": ""
+            "keyData": "__SSH_PUBKEY__"
           }
         ]
       }
     },
     "servicePrincipalProfile": {
-      "servicePrincipalClientID": "",
-      "servicePrincipalClientSecret": ""
+      "servicePrincipalClientID": "__CLIENT_ID__",
+      "servicePrincipalClientSecret": "__CLIENT_SECRET__"
     }
   }
 }
