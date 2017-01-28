@@ -111,4 +111,5 @@ while true; do
 	sleep 10
 done
 
-wget "http://${external_ip}" | grep 'Welcome to nginx!'
+curl -f "http://${external_ip}" | grep 'Welcome to nginx!'
+
