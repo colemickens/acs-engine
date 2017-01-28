@@ -23,11 +23,7 @@ function jqi() {
 	jq "${jqexpr}" "${filename}" > "${filename}.tmp" && mv "${filename}.tmp" "${filename}"
 }
 
-# TODO: remove this, write a wrapper script or something that does the echo|sanitizing I need
-function execho() {
-	# TODO: make this hide secrets on invocation AND output
-	"${@}"
-}
+# TODO: write a wrapper script or something that does the echo|sanitizing I need
 
 function deploy() {
 	echo "*********************************"
@@ -88,18 +84,18 @@ function deploy() {
 	fi
 
 	# Login to Azure-Cli
-	execho az login --service-principal \
+	az login --service-principal \
 		--username "${SERVICE_PRINCIPAL_CLIENT_ID}" \
 		--password "${SERVICE_PRINCIPAL_CLIENT_SECRET}" \
 		--tenant "${TENANT_ID}" &>/dev/null
 
-	execho az account set --subscription "${SUBSCRIPTION_ID}"
+	az account set --subscription "${SUBSCRIPTION_ID}"
 
 	# Deploy the template
-	execho az group create --name="${INSTANCE_NAME}" --location="${LOCATION}"
+	az group create --name="${INSTANCE_NAME}" --location="${LOCATION}"
 
 	sleep 3 # TODO: investigate why this is needed (eventual consistency in ARM)
-	execho az group deployment create \
+	az group deployment create \
 		--name "${INSTANCE_NAME}" \
 		--resource-group "${INSTANCE_NAME}" \
 		--template-file "${OUTPUT}/azuredeploy.json" \
