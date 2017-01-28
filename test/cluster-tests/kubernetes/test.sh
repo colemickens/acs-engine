@@ -16,6 +16,7 @@ echo "Running test in namespace: ${namespace}"
 trap teardown EXIT
 
 function teardown {
+  kubectl get all --all-namespaces
   kubectl delete namespaces ${namespace}
 }
 

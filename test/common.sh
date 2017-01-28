@@ -23,6 +23,7 @@ function jqi() {
 	jq "${jqexpr}" "${filename}" > "${filename}.tmp" && mv "${filename}.tmp" "${filename}"
 }
 
+# TODO: remove this, write a wrapper script or something that does the echo|sanitizing I need
 function execho() {
 	# TODO: make this hide secrets on invocation AND output
 	"${@}"
