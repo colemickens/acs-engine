@@ -19,34 +19,43 @@ function teardown {
   kubectl delete namespaces ${namespace}
 }
 
-count=0
-
-while [[ true ]]; do
-  echo "Testing number of nodes is ${EXPECTED_NODE_COUNT}"
+###### Check node count
+wait=5
+count=20
+while (( $count > 0 )); do
   node_count=$(kubectl get nodes --no-headers | wc | awk '{print $1}')
-  if [[ ${node_count} == ${EXPECTED_NODE_COUNT} ]]; then
-    break;
-  fi
-  count=(count+1)
-  if [[ ${count} > 24 ]]; then
-    echo "gave up on waiting for nodes (or any api connectivity)"
-    exit -1
-  fi
-  sleep 5
+  if (( ${node_count} == ${EXPECTED_NODE_COUNT} )); then break; fi
+  sleep 5; count=$((count-1))
 done
+if (( $count == 0 )); then
+  echo "gave up waiting for apiserver / node counts"; exit -1
+fi
+
+###### Wait for no more container creating
+#wait=5
+#count=20
+#while (( $count > 0 )); do
+#  node_count=$(kubectl get nodes --no-headers | wc | awk '{print $1}')
+#  if (( ${node_count} == ${EXPECTED_NODE_COUNT} )); then break; fi
+#  sleep 5; count=$((count-1))
+#done
+#if (( $count == 0 )); then
+#  echo "gave up waiting for apiserver / node counts"; exit -1
+#fi
 
 
 count=0;
-while [[ ${count} < 20 ]]; do
+while (( ${count} < 20 )); do
   echo "Waiting for Pods to all leave ContainerCreating"
   creating=$(kubectl get pods --namespace=${kube-system} | grep ContainerCreating | wc | awk '{print $1}')
   if [[ ${creating} == 0 ]]; then
     break
   fi
-  count=(count+1)
+  count=$((count+1))
   sleep 5
 done
 
+###### Check for Kube-DNS
 echo "Testing system tools are running"
 running=$(kubectl get pods --namespace=kube-system | grep kube-dns | grep Running | wc | awk '{print $1}')
 if [[ ${running} != ${EXPECTED_DNS} ]]; then
@@ -55,6 +64,7 @@ if [[ ${running} != ${EXPECTED_DNS} ]]; then
   exit 1
 fi
 
+###### Check for Kube-Dashboard
 echo "Testing system tools are running"
 running=$(kubectl get pods --namespace=kube-system | grep kubernetes-dashboard | grep Running | wc | awk '{print $1}')
 if [[ ${running} != ${EXPECTED_DASHBOARD} ]]; then
@@ -63,6 +73,7 @@ if [[ ${running} != ${EXPECTED_DASHBOARD} ]]; then
   exit 1
 fi
 
+###### Check for Kube-Proxys
 echo "Testing proxies are running"
 running=$(kubectl get pods --namespace=kube-system | grep kube-proxy | grep Running | wc | awk '{print $1}')
 if [[ ${running} != ${EXPECTED_NODE_COUNT} ]]; then
@@ -71,6 +82,7 @@ if [[ ${running} != ${EXPECTED_NODE_COUNT} ]]; then
   exit 1
 fi
 
+###### Testing an nginx deployment
 echo "Testing deployments"
 kubectl create namespace ${namespace}
 
@@ -82,7 +94,7 @@ while [[ ${count} < 10 ]]; do
   if [[ ${running} == 1 ]]; then
     break
   fi
-  count=(count+1)
+  count=$((count+1))
   sleep 5
 done
 
@@ -95,6 +107,7 @@ fi
 kubectl expose deployments/nginx --namespace=${namespace} --port=80
 
 # TODO actually check status here.
+# TODO actually create an LB and ensure it comes up correctly...
 sleep 10
 
 kubectl run busybox --image=busybox --attach=true --restart=Never --namespace=${namespace} -- wget nginx
