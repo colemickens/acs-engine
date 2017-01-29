@@ -45,14 +45,15 @@ fi
 
 echo $host
 
-remote_exec="ssh -i ${SSH_KEY} -p 22000 ${user}@${host}"
+remote_exec="ssh -i ${SSH_KEY} -p 22000 -o StrictHostKeyChecking=no azureuser@${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com"
+remote_cp="ssh -i ${SSH_KEY} -P 22000 -o StrictHostKeyChecking=no"
 
 function teardown {
   ${remote_exec} dcos marathon app remove /web
 }
 
-# TODO: this might break the jenkins job if the jenkisn job just pulls test.sh directly and not the dir...
-scp -i ${SSH_KEY} -P22000 ${DIR}/marathon.json ${user}@${host}:marathon.json
+# TODO: this might break the jenkins job if the jenkins job just pulls test.sh directly and not the dir...
+remote_cp "${DIR}/marathon.json" ${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com:marathon.json
 
 trap teardown EXIT
 

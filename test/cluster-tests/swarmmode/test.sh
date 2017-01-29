@@ -4,7 +4,9 @@ set -x
 set -e
 set -u
 
-remote_exec="ssh -i ${SSH_KEY} azureuser@${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com"
+# TODO: why is disabling host key verification needed here but not elsewhere?
+# it's not needed for kube because it uses kubeconfig... but ... oh dcos, may need it...
+remote_exec="ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no azureuser@${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com"
 
 function teardown {
   # TODO: write teardown
