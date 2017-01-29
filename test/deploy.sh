@@ -17,7 +17,7 @@ set -o pipefail
 ROOT="${DIR}/.."
 source "${ROOT}/test/common.sh"
 
-function cleanup() {
+function cleanup {
 	echo "maybe delete rg: ${INSTANCE_NAME}"
 	if [[ "${CLEANUP:-}" == "y" ]]; then
 		echo "really delete rg: ${INSTANCE_NAME}"
