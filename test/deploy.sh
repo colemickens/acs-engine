@@ -48,14 +48,6 @@ trap cleanup EXIT
 #   export CLUSTER_TYPE=kubernetes
 #   ./scripts/deploy.sh
 
-# Ensure CLUSTER_TYPE if VALIDATE is set
-if [[ "${VALIDATE:-}" == "y" ]]; then
-	if [[ -z "${CLUSTER_TYPE:-}" ]]; then
-		echo "you must specify CLUSTER_TYPE when VALIDATE=y"
-		exit -1
-	fi
-fi
-
 # Load any user set environment
 if [[ -f "${ROOT}/test/user.env" ]]; then
 	source "${ROOT}/test/user.env"
@@ -82,22 +74,13 @@ fi
 make -C "${ROOT}"
 deploy
 
-if [[ "${VALIDATE:-}" != "y" ]]; then
+if [[ -z "${VALIDATE:-}" ]]; then
 	exit 0
 fi
 
 export SSH_KEY="${ROOT}/_output/${INSTANCE_NAME}/id_rsa"
-if [[ "${CLUSTER_TYPE}" == "kubernetes" ]]; then
-	export KUBECONFIG="${ROOT}/_output/${INSTANCE_NAME}/kubeconfig/kubeconfig.${LOCATION}.json"
-	# TODO: make dcos/test.sh work without the args so that I don't have to special case calling test.sh
-	"${ROOT}/test/cluster-tests/${CLUSTER_TYPE}/test.sh"
-elif [[ "${CLUSTER_TYPE}" == "swarmmode" ]]; then
-	"${ROOT}/test/cluster-tests/${CLUSTER_TYPE}/test.sh"
-elif [[ "${CLUSTER_TYPE}" == "dcos" ]]; then
-	"${ROOT}/test/cluster-tests/${CLUSTER_TYPE}/test.sh" -h "${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com" -u "azureuser"
-else
-	echo "FAIL: no test defined for this cluster type"
-	exit -1
-fi
+export KUBECONFIG="${ROOT}/_output/${INSTANCE_NAME}/kubeconfig/kubeconfig.${LOCATION}.json"
+
+"${ROOT}/${VALIDATE}"
 
 echo "post-test..."
