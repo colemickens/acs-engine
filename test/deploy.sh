@@ -17,6 +17,13 @@ set -o pipefail
 ROOT="${DIR}/.."
 source "${ROOT}/test/common.sh"
 
+function cleanup() {
+	if [[ "${CLEANUP:-}" == "y" ]]; then
+		az group delete --no-wait --force --name "${INSTANCE_NAME}" || true
+	fi
+}
+trap cleanup EXIT
+
 # Usage:
 #
 # Manual user usage (Specific name):
@@ -61,6 +68,10 @@ fi
 # Set Instance Name for PR or random run
 if [[ ! -z "${PULL_NUMBER:-}" ]]; then
 	export INSTANCE_NAME="${JOB_NAME}-${PULL_NUMBER}-$(printf "%x" $(date '+%s'))"
+	# if we're running a pull request, assume we want to cleanup unless the user specified otherwise
+	if [[ -z "${CLEANUP:-}" ]]; then
+		export CLEANUP="y"
+	fi
 else
 	export INSTANCE_NAME_DEFAULT="${INSTANCE_NAME_PREFIX}-$(printf "%x" $(date '+%s'))"
 	export INSTANCE_NAME="${INSTANCE_NAME:-${INSTANCE_NAME_DEFAULT}}"
