@@ -4,7 +4,7 @@ set -x
 set -e
 set -u
 
-remote_exec="ssh -i ${SSH_KEY} azureuser@${INSTANCE_NAME}"
+remote_exec="ssh -i ${SSH_KEY} azureuser@${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com"
 
 function teardown {
   # TODO: write teardown
@@ -25,4 +25,12 @@ ${remote_exec} docker service create \
 
 sleep 60
 
-wget "http://${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com"
+echo "trying master agent pool"
+wget "http://${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com" || true
+echo $?
+
+echo "trying frst 'publicagent' pool"
+wget "http://${INSTANCE_NAME}0.${LOCATION}.cloudapp.azure.com" || true
+echo $?
+
+false

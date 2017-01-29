@@ -35,10 +35,6 @@ while getopts ":h:u:" o; do
 done
 shift $((OPTIND-1))
 
-if [[ ! -z $1 ]]; then
-  usage
-fi
-
 if [[ -z $host ]]; then
   host=$(az acs show --resource-group=${RESOURCE_GROUP} --name=${INSTANCE_NAME} --query=masterProfile.fqdn | sed -e 's/^"//' -e 's/"$//')
 fi
