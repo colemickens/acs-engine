@@ -73,6 +73,7 @@ if [[ "${VALIDATE:-}" != "y" ]]; then
 	exit 0
 fi
 
+export SSH_KEY="${ROOT}/_output/${INSTANCE_NAME}/id_rsa"
 if [[ "${CLUSTER_TYPE}" == "kubernetes" ]]; then
 	export KUBECONFIG="${ROOT}/_output/${INSTANCE_NAME}/kubeconfig/kubeconfig.${LOCATION}.json"
 fi

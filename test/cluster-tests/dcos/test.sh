@@ -3,6 +3,11 @@
 set -x
 set -e
 
+INSTANCE_NAME="${INSTANCE_NAME:-weeklytest}"
+RESOURCE_GROUP="${INSTANCE_NAME:-acs-weekly-dcos}"
+
+SSH_KEY="${SSH_KEY:-$HOME/.ssh/id_rsa}"
+
 usage() { echo "Usage: $0 [-h <hostname>] [-u <username>]" 1>&2; exit 1; }
 
 while getopts ":h:u:" o; do
@@ -25,16 +30,16 @@ if [[ ! -z $1 ]]; then
 fi
 
 if [[ -z $host ]]; then
-  host=$(az acs show --resource-group=acs-weekly-dcos --name=weekly-test --query=masterProfile.fqdn | sed -e 's/^"//' -e 's/"$//')
+  host=$(az acs show --resource-group=${RESOURCE_GROUP} --name=${INSTANCE_NAME} --query=masterProfile.fqdn | sed -e 's/^"//' -e 's/"$//')
 fi
 
 if [[ -z $user ]]; then
-  user=$(az acs show --resource-group=acs-weekly-dcos --name=weekly-test --query=linuxProfile.adminUsername | sed -e 's/^"//' -e 's/"$//')
+  user=$(az acs show --resource-group=${RESOURCE_GROUP} --name=${INSTANCE_NAME} --query=linuxProfile.adminUsername | sed -e 's/^"//' -e 's/"$//')
 fi
 
 echo $host
 
-remote_exec="ssh -i ~/.ssh/id_rsa ${user}@${host}"
+remote_exec="ssh -i ${SSH_KEY} ${user}@${host}"
 
 function teardown {
   ${remote_exec} dcos marathon app remove /web
