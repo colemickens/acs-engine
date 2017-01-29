@@ -8,28 +8,21 @@ remote_exec="ssh -i ${SSH_KEY} azureuser@${INSTANCE_NAME}"
 
 function teardown {
   # TODO: write teardown
+  echo "TODO: implement teardown"
 }
 
-scp -i ${SSH_KEY} ${HOME}/marathon.json ${user}@${host}:marathon.json
+${remote_exec} docker network create \
+	--driver overlay \
+	--subnet 10.0.9.0/24 \
+	--opt encrypted \
+	overlaynetwork0
 
-trap teardown EXIT
+${remote_exec} docker service create \
+	--replicas 3 \
+	--name nginxsvc0 \
+	--network overlaynetwork0 \
+	nginx
 
-${remote_exec} dcos marathon app add marathon.json
+sleep 60
 
-count=0
-while [[ ${count} < 10 ]]; do
-  count=(count + 1)
-  running=$(${remote_exec} dcos marathon app show /web | jq .tasksRunning)
-  if [[ "${running}" == "3" ]]; then
-    echo "Found 3 running tasks"
-    break
-  fi
-  sleep ${count}
-done
-
-if [[ "${running}" == "3" ]]; then
-  echo "Deployment succeeded"
-else
-  echo "Deployment failed"
-  exit 1
-fi
+wget "http://${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com"
