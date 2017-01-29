@@ -45,14 +45,14 @@ fi
 
 echo $host
 
-remote_exec="ssh -i ${SSH_KEY} ${user}@${host}"
+remote_exec="ssh -i ${SSH_KEY} -p 22000 ${user}@${host}"
 
 function teardown {
   ${remote_exec} dcos marathon app remove /web
 }
 
 # TODO: this might break the jenkins job if the jenkisn job just pulls test.sh directly and not the dir...
-scp -i ${SSH_KEY} ${DIR}/marathon.json ${user}@${host}:marathon.json
+scp -i ${SSH_KEY} -P22000 ${DIR}/marathon.json ${user}@${host}:marathon.json
 
 trap teardown EXIT
 
