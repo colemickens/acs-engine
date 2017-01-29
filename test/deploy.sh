@@ -24,7 +24,6 @@ function cleanup {
 		az group delete --no-wait --force --name "${INSTANCE_NAME}" || true
 	fi
 }
-trap cleanup EXIT
 
 # Usage:
 #
@@ -52,6 +51,8 @@ trap cleanup EXIT
 if [[ -f "${ROOT}/test/user.env" ]]; then
 	source "${ROOT}/test/user.env"
 fi
+
+trap cleanup EXIT
 
 # Ensure Cluster Definition
 if [[ -z "${CLUSTER_DEFINITION}" ]]; then
