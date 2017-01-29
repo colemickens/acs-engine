@@ -26,9 +26,6 @@ function jqi() {
 # TODO: write a wrapper script or something that does the echo|sanitizing I need
 
 function deploy() {
-	echo "*********************************"
-	env
-	echo "*********************************"
 	# Check pre-requisites
 	[[ ! -z "${INSTANCE_NAME:-}" ]] || (echo "Must specify INSTANCE_NAME" && exit -1)
 	[[ ! -z "${LOCATION:-}" ]] || (echo "Must specify LOCATION" && exit -1)
