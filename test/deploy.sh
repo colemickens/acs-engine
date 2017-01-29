@@ -85,3 +85,7 @@ export KUBECONFIG="${ROOT}/_output/${INSTANCE_NAME}/kubeconfig/kubeconfig.${LOCA
 "${ROOT}/${VALIDATE}"
 
 echo "post-test..."
+
+# TODO: this shouldn't be necessary but this trap doesn't seem to fire
+# so... manually call it (of course, this only works in the happy path)
+cleanup
