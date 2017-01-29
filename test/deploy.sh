@@ -97,3 +97,5 @@ else
 	echo "FAIL: no test defined for this cluster type"
 	exit -1
 fi
+
+echo "post-test..."

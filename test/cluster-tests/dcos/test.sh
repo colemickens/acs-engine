@@ -18,7 +18,7 @@ remote_exec="ssh -i "${SSH_KEY}" -o StrictHostKeyChecking=no azureuser@${INSTANC
 remote_cp="scp -i "${SSH_KEY}" -P 2200 -o StrictHostKeyChecking=no"
 
 function teardown {
-  ${remote_exec} dcos marathon app remove /web
+  ${remote_exec} ./dcos marathon app remove /web
 }
 
 ${remote_exec} curl -O https://downloads.dcos.io/binaries/cli/linux/x86-64/dcos-1.8/dcos
