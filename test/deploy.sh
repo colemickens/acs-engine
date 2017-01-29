@@ -18,9 +18,7 @@ ROOT="${DIR}/.."
 source "${ROOT}/test/common.sh"
 
 function cleanup {
-	echo "maybe delete rg: ${INSTANCE_NAME}"
 	if [[ "${CLEANUP:-}" == "y" ]]; then
-		echo "really delete rg: ${INSTANCE_NAME}"
 		#az group delete --no-wait --force --name "${INSTANCE_NAME}" || true
 		az group delete --no-wait --name "${INSTANCE_NAME}" || true
 	fi
@@ -47,6 +45,8 @@ function cleanup {
 #   export CLUSTER_DEFIITION=examples/kubernetes.json
 #   export CLUSTER_TYPE=kubernetes
 #   ./scripts/deploy.sh
+
+false
 
 # Load any user set environment
 if [[ -f "${ROOT}/test/user.env" ]]; then
