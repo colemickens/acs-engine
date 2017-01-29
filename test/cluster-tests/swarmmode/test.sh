@@ -6,37 +6,37 @@ set -u
 
 # TODO: why is disabling host key verification needed here but not elsewhere?
 # it's not needed for kube because it uses kubeconfig... but ... oh dcos, may need it...
-remote_exec="ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no azureuser@${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com"
+remote_exec="ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -p2200 azureuser@${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com"
 
 function teardown {
-  # TODO: write teardown
-  echo "TODO: implement teardown"
+  ${remote_exec} docker service rm nginx || true
+  ${remote_exec} docker network rm network || true
 }
+
+trap teardown EXIT
 
 # this hung for me, it seems??
 # adding sleep to see if it helps
-sleep 60
+sleep 10
 
 ${remote_exec} docker network create \
 	--driver overlay \
 	--subnet 10.0.9.0/24 \
 	--opt encrypted \
-	overlaynetwork0
+	network
 
 ${remote_exec} docker service create \
 	--replicas 3 \
-	--name nginxsvc0 \
-	--network overlaynetwork0 \
+	--name nginx \
+	--network network \
 	nginx
 
-sleep 60
+${remote_exec} docker service create \
+	--name busybox \
+	--network network \
+	busybox \
+	sleep 3000
 
-echo "trying master agent pool"
-wget "http://${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com" || true
-echo $?
-
-echo "trying frst 'publicagent' pool"
-wget "http://${INSTANCE_NAME}0.${LOCATION}.cloudapp.azure.com" || true
-echo $?
+# still not sure how to actually test it...
 
 false
