@@ -45,7 +45,7 @@ function teardown {
   ${remote_exec} dcos marathon app remove /web
 }
 
-scp -i ~/.ssh/id_rsa ${HOME}/marathon.json ${user}@${host}:marathon.json
+scp -i ${SSH_KEY} ${HOME}/marathon.json ${user}@${host}:marathon.json
 
 trap teardown EXIT
 
