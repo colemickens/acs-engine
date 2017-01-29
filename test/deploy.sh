@@ -21,7 +21,8 @@ function cleanup {
 	echo "maybe delete rg: ${INSTANCE_NAME}"
 	if [[ "${CLEANUP:-}" == "y" ]]; then
 		echo "really delete rg: ${INSTANCE_NAME}"
-		az group delete --no-wait --force --name "${INSTANCE_NAME}" || true
+		#az group delete --no-wait --force --name "${INSTANCE_NAME}" || true
+		az group delete --no-wait --name "${INSTANCE_NAME}" || true
 	fi
 }
 
