@@ -24,7 +24,6 @@ function cleanup {
 	fi
 }
 
-
 # Usage:
 #
 # Manual user usage (Specific name):

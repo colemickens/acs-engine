@@ -32,5 +32,3 @@ sleep 10
 
 # only publicagent pool is exposed to internet
 wget http://${INSTANCE_NAME}0.${LOCATION}.cloudapp.azure.com:80/
-
-# not sure what else to do to validate
