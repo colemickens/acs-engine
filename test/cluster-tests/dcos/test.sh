@@ -10,7 +10,8 @@ done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 ####################################################
 
-set -eu -o pipefail
+set -e
+# -o pipefail
 set -x
 
 INSTANCE_NAME="${INSTANCE_NAME:-weeklytest}"
@@ -45,24 +46,29 @@ fi
 
 echo $host
 
-remote_exec="ssh -i ${SSH_KEY} -p 22000 -o StrictHostKeyChecking=no azureuser@${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com"
-remote_cp="ssh -i ${SSH_KEY} -P 22000 -o StrictHostKeyChecking=no"
+# TODO: This is not backward compatible with the jenkins job normal usage, this only works when called with INSTANCE NAME (so as above... )
+remote_exec="ssh -i "${SSH_KEY}" -o StrictHostKeyChecking=no azureuser@${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com -p2200"
+remote_cp="scp -i "${SSH_KEY}" -P 2200 -o StrictHostKeyChecking=no"
 
 function teardown {
   ${remote_exec} dcos marathon app remove /web
 }
 
+${remote_exec} curl -O https://downloads.dcos.io/binaries/cli/linux/x86-64/dcos-1.8/dcos
+${remote_exec} chmod a+x ./dcos
+${remote_exec} ./dcos config set core.dcos_url http://localhost:80
+
 # TODO: this might break the jenkins job if the jenkins job just pulls test.sh directly and not the dir...
-remote_cp "${DIR}/marathon.json" ${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com:marathon.json
+${remote_cp} "${DIR}/marathon.json" azureuser@${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com:marathon.json
 
-trap teardown EXIT
+#################trap teardown EXIT
 
-${remote_exec} dcos marathon app add marathon.json
+${remote_exec} ./dcos marathon app add marathon.json
 
 count=0
-while [[ ${count} < 10 ]]; do
-  count=(count + 1)
-  running=$(${remote_exec} dcos marathon app show /web | jq .tasksRunning)
+while [[ ${count} -lt 10 ]]; do
+  count=$((count+1))
+  running=$(${remote_exec} ./dcos marathon app show /web | jq .tasksRunning)
   if [[ "${running}" == "3" ]]; then
     echo "Found 3 running tasks"
     break
@@ -74,5 +80,6 @@ if [[ "${running}" == "3" ]]; then
   echo "Deployment succeeded"
 else
   echo "Deployment failed"
+  ${remote_exec} ./dcos marathon app show /web
   exit 1
 fi
