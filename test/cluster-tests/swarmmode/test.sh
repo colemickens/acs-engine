@@ -13,6 +13,10 @@ function teardown {
   echo "TODO: implement teardown"
 }
 
+# this hung for me, it seems??
+# adding sleep to see if it helps
+sleep 60
+
 ${remote_exec} docker network create \
 	--driver overlay \
 	--subnet 10.0.9.0/24 \

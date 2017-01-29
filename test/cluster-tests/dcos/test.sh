@@ -66,7 +66,7 @@ ${remote_cp} "${DIR}/marathon.json" azureuser@${INSTANCE_NAME}.${LOCATION}.cloud
 ${remote_exec} ./dcos marathon app add marathon.json
 
 count=0
-while [[ ${count} -lt 10 ]]; do
+while [[ ${count} -lt 25 ]]; do
   count=$((count+1))
   running=$(${remote_exec} ./dcos marathon app show /web | jq .tasksRunning)
   if [[ "${running}" == "3" ]]; then
