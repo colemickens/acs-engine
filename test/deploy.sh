@@ -24,6 +24,7 @@ function cleanup {
 	fi
 }
 
+
 # Usage:
 #
 # Manual user usage (Specific name):
@@ -46,14 +47,11 @@ function cleanup {
 #   export CLUSTER_TYPE=kubernetes
 #   ./scripts/deploy.sh
 
-false
-
 # Load any user set environment
 if [[ -f "${ROOT}/test/user.env" ]]; then
 	source "${ROOT}/test/user.env"
 fi
 
-trap cleanup EXIT
 
 # Ensure Cluster Definition
 if [[ -z "${CLUSTER_DEFINITION}" ]]; then
@@ -74,6 +72,7 @@ else
 fi
 
 make -C "${ROOT}"
+trap cleanup EXIT
 deploy
 
 if [[ -z "${VALIDATE:-}" ]]; then
