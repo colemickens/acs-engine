@@ -10,14 +10,13 @@ remote_exec="ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -p2200 azureuser@${IN
 
 function teardown {
   ${remote_exec} docker service rm nginx || true
+  ${remote_exec} docker service rm busybox || true
+  sleep 10
   ${remote_exec} docker network rm network || true
 }
 
 trap teardown EXIT
-
-# this hung for me, it seems??
-# adding sleep to see if it helps
-sleep 10
+sleep 60
 
 ${remote_exec} docker network create \
 	--driver overlay \
@@ -29,14 +28,12 @@ ${remote_exec} docker service create \
 	--replicas 3 \
 	--name nginx \
 	--network network \
+	--publish 80:80 \
 	nginx
 
-${remote_exec} docker service create \
-	--name busybox \
-	--network network \
-	busybox \
-	sleep 3000
+sleep 10
 
-# still not sure how to actually test it...
+# only publicagent pool is exposed to internet
+wget http://${INSTANCE_NAME}0.${LOCATION}.cloudapp.azure.com:80/
 
-false
+# not sure what else to do to validate
