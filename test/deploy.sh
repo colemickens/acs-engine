@@ -78,6 +78,11 @@ if [[ "${CLUSTER_TYPE}" == "kubernetes" ]]; then
 	export KUBECONFIG="${ROOT}/_output/${INSTANCE_NAME}/kubeconfig/kubeconfig.${LOCATION}.json"
 	# TODO: make dcos/test.sh work without the args so that I don't have to special case calling test.sh
 	"${ROOT}/test/cluster-tests/${CLUSTER_TYPE}/test.sh"
+elif [[ "${CLUSTER_TYPE}" == "swarmmode" ]]; then
+	"${ROOT}/test/cluster-tests/${CLUSTER_TYPE}/test.sh"
 elif [[ "${CLUSTER_TYPE}" == "dcos" ]]; then
 	"${ROOT}/test/cluster-tests/${CLUSTER_TYPE}/test.sh" -h "${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com" -u "azureuser"
+else
+	echo "FAIL: no test defined for this cluster type"
+	exit -1
 fi

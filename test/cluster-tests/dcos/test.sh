@@ -1,7 +1,17 @@
 #!/bin/bash
 
+####################################################
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+####################################################
+
+set -eu -o pipefail
 set -x
-set -e
 
 INSTANCE_NAME="${INSTANCE_NAME:-weeklytest}"
 RESOURCE_GROUP="${INSTANCE_NAME:-acs-weekly-dcos}"
@@ -45,7 +55,8 @@ function teardown {
   ${remote_exec} dcos marathon app remove /web
 }
 
-scp -i ${SSH_KEY} ${HOME}/marathon.json ${user}@${host}:marathon.json
+# TODO: this might break the jenkins job if the jenkisn job just pulls test.sh directly and not the dir...
+scp -i ${SSH_KEY} ${DIR}/marathon.json ${user}@${host}:marathon.json
 
 trap teardown EXIT
 
