@@ -76,6 +76,8 @@ fi
 export SSH_KEY="${ROOT}/_output/${INSTANCE_NAME}/id_rsa"
 if [[ "${CLUSTER_TYPE}" == "kubernetes" ]]; then
 	export KUBECONFIG="${ROOT}/_output/${INSTANCE_NAME}/kubeconfig/kubeconfig.${LOCATION}.json"
+	# TODO: make dcos/test.sh work without the args so that I don't have to special case calling test.sh
+	"${ROOT}/test/cluster-tests/${CLUSTER_TYPE}/test.sh"
+elif [[ "${CLUSTER_TYPE}" == "dcos" ]]; then
+	"${ROOT}/test/cluster-tests/${CLUSTER_TYPE}/test.sh" -h "${INSTANCE_NAME}.${LOCATION}.cloudapp.azure.com" -u "azureuser"
 fi
-
-"${ROOT}/test/cluster-tests/${CLUSTER_TYPE}/test.sh"
