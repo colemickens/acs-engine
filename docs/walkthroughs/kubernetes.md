@@ -1,4 +1,4 @@
-# Microsoft Azure Container Service Engine - Kubernetes Walkthrough
+# Azure Container Service Engine - Kubernetes Walkthrough
 
 ## Deployment
 

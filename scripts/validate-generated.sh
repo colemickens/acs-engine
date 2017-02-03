@@ -19,9 +19,12 @@ cp -a "${DIR}/.." "${T}/"
 
 (cd "${T}/" && go generate ./...)
 
+# TODO This can be simplified now that go-bindata doesn't wreck the timestamps
 if ! diff -I '.*bindataFileInfo.*' --exclude=.git -r "${DIR}/.." "${T}" 2>&1 ; then 
 	echo "go generate produced changes that were not already present"
 	exit 1
 fi
+
+# TODO: validate the markdown fmt has no outpt
 
 echo "Generated assets have no material difference than what is committed."

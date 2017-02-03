@@ -1,4 +1,4 @@
-# Microsoft Azure Container Service Engine - Swarm Walkthrough
+# Azure Container Service Engine - Swarm Walkthrough
 
 ## Deployment
 

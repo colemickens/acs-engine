@@ -24,15 +24,19 @@ This project is used to enable new features in the ACS, as well as host
 experimental modifications that may never make their way to the hosted Service,
 due to licensing, supportability, or other reasons.
 
+[Other Frequently Asked Questions]()
 
 ## Documentation
 
 * [Frequently Asked Questions](faq.md) - FAQs about `acs-engine` each orchestrator
-* [Advanced Usage](docs/usage.md) - describes advanced usages of `acs-engine` including classic
-    mode, output directory, deployment with PowerShell, etc...
-* [Customization](docs/customization.md) - how to customize your cluster deployments (custom 
-    virtual network, managed disks, etc)
-* [Development](docs/contributing.md) - how to build `acs-engine`, how to add features to the apimodel
+* [Development](docs/development.md) - how to build `acs-engine`, how to add features to the apimodel
+    (possibly to contribute back)
+* [Customization](docs/customization.md) - how to customize your cluster deployments (custom
+    virtual network, managed disks, etc) by enabling features in your apimodel
+* [Usage](docs/usage.md) - how to use `acs-engine` to create an ARM template for a container orchestrator
+    cluster from an apimodel
+    (possibly to contribute back)
+* [Development](docs/development.md) - how to build `acs-engine`, how to add features to the apimodel
     (possibly to contribute back)
 
 * [Walkthrough: Kubernetes](docs/walkthroughs/kubernetes.md)
@@ -126,3 +130,73 @@ Please follow these instructions before submitting a PR:
 ## Code of conduct
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+
+# Contributing
+
+## Contents
+
+* [Building](#building)
+  * [Building (Docker)](#building-docker)
+  * [Building (Linux)](#building-linux)
+  * [Building (Windows)](#buiding-windows)
+* [Deployment](#deployment)
+  * [Deployment (Azure CLI)](#deployment-azure-cli)
+  * [Deployment (PowerShell)](#deployment-powershell)
+  * [Deployment (azure-xplat-cli)](#deployment-azure-xplat-cli)
+* [Usage](#usage)
+
+## Building
+
+The recommended way of building and using `acs-engine`, *on all platforms*,
+is to use Docker. It's the best way to ensure that all developers
+and users are using the same tooling and environment.
+
+### Building (Docker) (recommended!)
+
+This will allow you to edit source code on your normal
+machine, while building and executing `acs-engine` in a
+Docker container where everything is configured. The output
+files created in the container will still be available
+after you exit.
+
+1. Enter the development environment:
+
+  **Linux/Mac:** `./scripts/devenv.sh`
+  **Windows:**  `.\scripts\devenv.ps1`
+
+2. Run make:
+  ```
+  make
+  ```
+
+### Building (Linux)
+
+1. Ensure Go is installed.
+2. Ensure the `GOPATH` and `PATH` are configured.
+3. Run `make`.
+
+### Building (Windows)
+
+1. Ensure Go is installed.
+2. Ensure the 
+
+## Usage
+
+```
+# acs-engine
+Usage of acs-engine:
+  -artifacts string
+    	directory where artifacts will be written
+  -caCertificatePath string
+    	the path to the CA Certificate file
+  -caKeyPath string
+    	the path to the CA key file
+  -classicMode
+    	enable classic parameters and outputs
+  -noPrettyPrint
+    	do not pretty print output
+  -parametersOnly
+    	only output the parameters
+```
+

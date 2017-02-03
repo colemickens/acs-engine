@@ -1,4 +1,4 @@
-# Microsoft Azure Container Service Engine - DockerCE/Swarm Mode Walkthrough
+# Azure Container Service Engine - DockerCE/Swarm Mode Walkthrough
 
 ## Deployment
 

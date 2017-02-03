@@ -1,6 +1,6 @@
 # Azure Container Service Engine - Cluster Definition
 
-##Cluster Defintions for apiVersion "vlabs"
+## Cluster Defintions for apiVersion "vlabs"
 
 Here are the cluster definitions for apiVersion "vlabs"
 

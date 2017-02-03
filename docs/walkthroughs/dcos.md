@@ -1,4 +1,4 @@
-# Microsoft Azure Container Service Engine - DC/OS Walkthrough
+# Azure Container Service Engine - DC/OS Walkthrough
 
 ## Deployment
 
