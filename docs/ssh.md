@@ -1,4 +1,4 @@
-# Microsoft Azure Container Service Engine - SSH
+# Azure Container Service Engine - SSH
 
 # SSH Key Management
 

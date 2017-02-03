@@ -1,10 +1,10 @@
 .NOTPARALLEL:
 .PHONY: prereqs build test validate-generated lint ci devenv
 
-all: build
+#IMAGE=docker.io/azurecontainers/acs-engine:latest
+IMAGE=docker.io/colemickens/acs-engine:latest
 
-devenv:
-	./scripts/devenv.sh
+all: build
 
 prereqs:
 	go get github.com/jteeuwen/go-bindata/...
@@ -25,6 +25,10 @@ lint:
 	# golint -set_exit_status
 
 ci: validate-generated build test lint
+
+publish:
+	docker build -t $(IMAGE)
+	docker push $(IMAGE)
 
 devenv:
 	./scripts/devenv.sh

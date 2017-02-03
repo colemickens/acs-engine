@@ -27,13 +27,23 @@ due to licensing, supportability, or other reasons.
 
 ## Documentation
 
+* [Frequently Asked Questions](faq.md) - FAQs about `acs-engine` each orchestrator
+* [Advanced Usage](docs/usage.md) - describes advanced usages of `acs-engine` including classic
+    mode, output directory, deployment with PowerShell, etc...
+* [Customization](docs/customization.md) - how to customize your cluster deployments (custom 
+    virtual network, managed disks, etc)
+* [Development](docs/contributing.md) - how to build `acs-engine`, how to add features to the apimodel
+    (possibly to contribute back)
 
-### Quickstart
+* [Walkthrough: Kubernetes](docs/walkthroughs/kubernetes.md)
+* [Walkthrough: Swarm](docs/walkthroughs/swarm.md)
+* [Walkthrough: Swarm Mode](docs/walkthroughs/swarmmode.md)
+* [Walkthrough: DCOS](docs/walkthroughs/dcos.md)
 
-Until binary builds are produced, the easiest way to get started is to perform
-the following steps. Note that `docker` or "Docker for {Windows,Mac}" is required.
+## Simple Usage
 
-**Required:** `docker` (or "Docker for Windows" or "Docker for Mac")
+This is the normal manual way of using ACS-Engine, you may be interested
+in [the quick advanced usage](usage.md#usage-quick).
 
 1. Clone the repo and enter the directory
   ```
@@ -88,9 +98,7 @@ the following steps. Note that `docker` or "Docker for {Windows,Mac}" is require
    name for your cluster. With Kubernetes, you probably want to just use the
    kubeconfig file, such as `kubeconfig.westus2.json`.
 
-
-
-## Contributing
+## Further Reading
 
 Please follow these instructions before submitting a PR:
 
@@ -100,9 +108,10 @@ Please follow these instructions before submitting a PR:
    For example, if you have to change the expected resulting templates then you
    should deploy the relevant example cluster definitions to ensure you're not
    introducing any sort of regression.
+
 ### Developer Guide
 
-* [Quick Usage](docs/quickusage.md): shows you how to build and use the ACS engine to generate custom Docker enabled container clusters
+* [Quick Usage](docs/development.md): shows you how to build and use the ACS engine to generate custom Docker enabled container clusters
 
 * [Cluster Definition](docs/clusterdefinition.md) - describes the components of the cluster definition file
 * [DC/OS Walkthrough](docs/dcos.md) - shows how to create a DC/OS enabled Docker cluster on Azure
@@ -113,3 +122,7 @@ Please follow these instructions before submitting a PR:
 * [Attached Disks](examples/disks-storageaccount) - shows how to attach up to 4 disks per node
 * [Managed Disks](examples/disks-managed) (under private preview) - shows how to use managed disks 
 * [Large Clusters](examples/largeclusters) - shows how to create cluster sizes of up to 1200 nodes
+
+## Code of conduct
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
