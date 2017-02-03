@@ -28,6 +28,6 @@ RUN go get -u github.com/shurcooL/markdownfmt/...
 # Used by some CI jobs
 ADD ./test/bootstrap/checkout-pr.sh /tmp/checkout-pr.sh
 
-RUN echo 'export PS1="[acs-engine] \W # "' >> /root/.bash_profile
+RUN echo 'export PS1="\e[1;33m[acs-engine]\e[0;37m \W\e[0;37m # "' >> /root/.profile
 
 WORKDIR /gopath/src/github.com/Azure/acs-engine

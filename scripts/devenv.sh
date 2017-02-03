@@ -6,7 +6,7 @@ set -x
 docker build --pull -t acs-engine .
 
 docker run -it \
-	-v `pwd`:/gopath/src/github.com/Azure/acs-engine \
-	-w /gopath/src/github.com/Azure/acs-engine \
+	--volume="$(pwd):/gopath/src/github.com/Azure/acs-engine" \
+	--env=TERM=xterm \
 		acs-engine /bin/bash -l
 
