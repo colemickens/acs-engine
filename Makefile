@@ -1,16 +1,23 @@
 .NOTPARALLEL:
+.PHONY: prereqs build test validate-generated lint ci devenv
 
-.PHONY: build test validate-generated lint ci devenv
+all: build
 
-build:
+devenv:
+	./scripts/devenv.sh
+
+prereqs:
+	go get github.com/jteeuwen/go-bindata/...
+
+build: prereqs
 	go generate -v ./...
-	go get .
+	go get -d ./...
 	go build -v
 
 test:
 	go test -v ./...
 
-validate-generated:
+validate-generated: prereqs
 	./scripts/validate-generated.sh
 
 lint:

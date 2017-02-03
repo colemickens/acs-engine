@@ -1,8 +1,8 @@
-# Microsoft Azure Container Service Engine - Builds Docker Enabled Clusters
+# Azure Container Service Engine - Container Freedom
 
 ## Overview
 
-The Azure Container Service Engine (`acs-engine`) generates ARM (Azure Resource Manager) templates for Docker enabled clusters on Microsoft Azure with your choice of DC/OS, Kubernetes, or Swarm orchestrators. The input to the tool is a cluster definition. The cluster definition is very similar to (in many cases the same as) the ARM template syntax used to deploy a Microsoft Azure Container Service cluster.
+The Azure Container Service Engine (`acs-engine`) generates ARM (Azure Resource Manager) templates which deploy a container orchestrator on Microsoft Azure. This tool consumes an "apimodel" which is very similar to (and in many cases, the same as) the ARM template object used to deploy an Azure Container Service cluster.
 
 The cluster definition file enables the following customizations to your Docker enabled cluster:
 * choice of DC/OS, Kubernetes, or Swarm orchestrators
@@ -14,18 +14,81 @@ The cluster definition file enables the following customizations to your Docker 
 * Docker cluster sizes of 1200
 * Custom VNET
 
-## User guides
+## Azure Container Service vs ACS-Engine
 
-* [ACS Engine](docs/acsengine.md) - shows you how to build and use the ACS engine to generate custom Docker enabled container clusters
-* [Cluster Definition](docs/clusterdefinition.md) - describes the components of the cluster definition file
-* [DC/OS Walkthrough](docs/dcos.md) - shows how to create a DC/OS enabled Docker cluster on Azure
-* [Kubernetes Walkthrough](docs/kubernetes.md) - shows how to create a Kubernetes enabled Docker cluster on Azure
-* [Swarm Walkthrough](docs/swarm.md) - shows how to create a Swarm enabled Docker cluster on Azure
-* [DockerCE Walkthrough](docs/swarmmode.md) - shows how to create a DockerCE cluster on Azure
-* [Custom VNET](examples/vnet) - shows how to use a custom VNET 
-* [Attached Disks](examples/disks-storageaccount) - shows how to attach up to 4 disks per node
-* [Managed Disks](examples/disks-managed) (under private preview) - shows how to use managed disks 
-* [Large Clusters](examples/largeclusters) - shows how to create cluster sizes of up to 1200 nodes
+[Azure Container Service] (ACS) is Microsoft Azure's container orchestration solution.
+It offers installations of Kubernetes, DCOS, Swarm and Swarm Mode.
+
+[ACS-Engine] is the open-source core of the [Azure Container Service].
+This project is used to enable new features in the ACS, as well as host
+experimental modifications that may never make their way to the hosted Service,
+due to licensing, supportability, or other reasons.
+
+
+## Documentation
+
+
+### Quickstart
+
+Until binary builds are produced, the easiest way to get started is to perform
+the following steps. Note that `docker` or "Docker for {Windows,Mac}" is required.
+
+**Required:** `docker` (or "Docker for Windows" or "Docker for Mac")
+
+1. Clone the repo and enter the directory
+  ```
+  git clone https://github.com/Azure/acs-engine
+  cd acs-engine
+  ```
+
+2. Enter the development environment:
+
+  This assumes usage of `docker` (or Docker for Windows/Mac).
+  (Alternatives: [building under Windows](), [building under Mac]()).
+
+  **Linux/Mac:** `./scripts/devenv.sh`
+  **Windows:**  `.\scripts\devenv.ps1`
+
+3. Create a cluster defintion from an example:
+  1. Copy a cluster definition from `examples/`.
+  2. Name it `clusterdefinition.json`.
+  3. Edit it:
+    * Add your SSH Key
+    * Edit the FQDNs as appropriate
+    * Edit the ServicePrincipalProfile section (Kubernetes only)
+
+4. Generate the ARM Template and Parameters
+  **Linux/Mac:** `./acs-engine clusterdefinition.json`
+  **Windows:**  `.\acs-engine.exe clusterdefinition.json`
+
+5. Checkout the Generated Assets
+  ```
+  cd _output/<instance>
+  ```
+
+  In this directory, you will find the generated assets, such as
+  ARM template, parameters file, and in the case of Kubernetes,
+  the generated PKI assets and the kubeconfig(s).
+
+
+4. Create a Resource Group and Deployment
+
+  This step assumes usage of the [Azure CLI](https://github.com/Azure/azure-cli).
+  (Alternatives: [deploy with PowerShell](), [deploy with legacy azure-xplat-cli]())
+
+  ```
+  az resource group create --name "somename" --location "westus2"
+
+  az group deployment create --name "somename-deployment1"
+    --template-file "azuredeploy.json" \
+    --parameters "@azuredeploy.parameters.json"
+  ```
+
+5. You're done. You can now use your SSH credentials with the appropriate domain
+   name for your cluster. With Kubernetes, you probably want to just use the
+   kubeconfig file, such as `kubeconfig.westus2.json`.
+
+
 
 ## Contributing
 
@@ -37,92 +100,16 @@ Please follow these instructions before submitting a PR:
    For example, if you have to change the expected resulting templates then you
    should deploy the relevant example cluster definitions to ensure you're not
    introducing any sort of regression.
+### Developer Guide
 
-## Usage (Template Generation)
+* [Quick Usage](docs/quickusage.md): shows you how to build and use the ACS engine to generate custom Docker enabled container clusters
 
-Usage is best demonstrated with an example:
-
-```shell
-$ vim examples/kubernetes.classic.json
-
-# insert your preferred, unique DNS prefix
-# insert your SSH public key
-
-$ ./acs-engine examples/kubernetes.classic.json
-```
-
-This produces a new directory inside `_output/` that contains an ARM template
-for deploying Kubernetes into Azure. (In the case of Kubernetes, some additional
-needed assets are generated and placed in the output directory.)
-
-## Deployment Usage
-
-Generated templates can be deployed using
-[the Azure XPlat CLI (v0.10**.0** only)](https://github.com/Azure/azure-xplat-cli/releases/tag/v0.10.0-May2016),
-[the Azure CLI 2.0](https://github.com/Azure/azure-cli) or
-[Powershell](https://github.com/Azure/azure-powershell).
-
-### Deploying with Azure XPlat CLI
-
-**NOTE:** Some deployments will fail if certain versions of the Azure XPlat CLI are used. It's recommended that you use [Azure XPlat CLI 0.10**.0**](https://github.com/Azure/azure-xplat-cli/releases/tag/v0.10.0-May2016) until a new point release of `0.10.x` is available with the fix.
-
-```bash
-$ azure login
-
-$ azure account set "<SUBSCRIPTION NAME OR ID>"
-
-$ azure config mode arm
-
-$ azure group create \
-    --name="<RESOURCE_GROUP_NAME>" \
-    --location="<LOCATION>"
-
-$ azure group deployment create \
-    --name="<DEPLOYMENT NAME>" \
-    --resource-group="<RESOURCE_GROUP_NAME>" \
-    --template-file="./_output/<INSTANCE>/azuredeploy.json" \
-    --parameters-file="./_output/<INSTANCE>/azuredeploy.parameters.json"
-```
-
-### Deploying with Azure CLI 2.0
-**NOTE:** Azure CLI 2.0 is still in preview, so changes may occur.
-Please reference [the Azure CLI 2.0 GitHub Repo](https://github.com/Azure/azure-cli) for updated commands and please
-ensure that your installation is up to date with the latest release. (Releases occur weekly!)
-
-```bash
-$ az login
-
-$ az account set --subscription "<SUBSCRIPTION NAME OR ID>"
-
-$ az group create \
-    --name "<RESOURCE_GROUP_NAME>" \
-    --location "<LOCATION>"
-
-$ az group deployment create \
-    --name "<DEPLOYMENT NAME>" \
-    --resource-group "<RESOURCE_GROUP_NAME>" \
-    --template-file "./_output/<INSTANCE>/azuredeploy.json" \
-    --parameters "@./_output/<INSTANCE>/azuredeploy.parameters.json"
-```
-
-### Deploying with Powershell
-
-```powershell
-Add-AzureRmAccount
-
-Select-AzureRmSubscription -SubscriptionID <SUBSCRIPTION_ID>
-
-New-AzureRmResourceGroup `
-    -Name <RESOURCE_GROUP_NAME> `
-    -Location <LOCATION>
-
-New-AzureRmResourceGroupDeployment `
-    -Name <DEPLOYMENT_NAME> `
-    -ResourceGroupName <RESOURCE_GROUP_NAME> `
-    -TemplateFile _output\<INSTANCE>\azuredeploy.json `
-    -TemplateParameterFile _output\<INSTANCE>\azuredeploy.parameters.json
-```
-
-## Code of conduct
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+* [Cluster Definition](docs/clusterdefinition.md) - describes the components of the cluster definition file
+* [DC/OS Walkthrough](docs/dcos.md) - shows how to create a DC/OS enabled Docker cluster on Azure
+* [Kubernetes Walkthrough](docs/kubernetes.md) - shows how to create a Kubernetes enabled Docker cluster on Azure
+* [Swarm Walkthrough](docs/swarm.md) - shows how to create a Swarm enabled Docker cluster on Azure
+* [DockerCE Walkthrough](docs/swarmmode.md) - shows how to create a DockerCE cluster on Azure
+* [Custom VNET](examples/vnet) - shows how to use a custom VNET 
+* [Attached Disks](examples/disks-storageaccount) - shows how to attach up to 4 disks per node
+* [Managed Disks](examples/disks-managed) (under private preview) - shows how to use managed disks 
+* [Large Clusters](examples/largeclusters) - shows how to create cluster sizes of up to 1200 nodes
