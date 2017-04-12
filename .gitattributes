@@ -1,1 +1,3 @@
-* -crlf
+* text=auto eol=lf
+
+*.t text
