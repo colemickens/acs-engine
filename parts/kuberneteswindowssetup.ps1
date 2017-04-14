@@ -50,6 +50,7 @@ $global:KubeletStartFile = $global:KubeDir + "\kubeletstart.ps1"
 $global:KubeProxyStartFile = $global:KubeDir + "\kubeproxystart.ps1"
 $global:NatNetworkName="nat"
 $global:TransparentNetworkName="transparentNet"
+md $global:KubeDir
 
 $global:TenantId = "{{{tenantID}}}"
 $global:SubscriptionId = "{{{subscriptionId}}}"
@@ -66,7 +67,7 @@ function
 Write-Log($message)
 {
     $msg = $message | Timestamp
-    Write-Output $msg
+    $msg | Out-File -Append -FilePath C:\k\bootstrap.log
 }
 
 function
@@ -282,6 +283,8 @@ Set-Explorer
     New-ItemProperty -Path HKLM:"\\SOFTWARE\\Policies\\Microsoft\\Internet Explorer\\Main" -Name "Start Page" -Type String -Value http://bing.com
 }
 
+
+Start-Transcript "$global:KubeDir\cse.transcript.txt"
 try
 {
     # Set to false for debugging.  This will output the start script to
@@ -329,4 +332,7 @@ try
 catch
 {
     Write-Error $_
+}
+finally {
+    Stop-Transcript
 }
