@@ -205,6 +205,7 @@ write_files:
     ExecStartPre=/usr/bin/docker run --rm -v /tmp/kubectldir:/opt/kubectldir {{{kubernetesHyperkubeSpec}}} /bin/bash -c "cp /hyperkube /opt/kubectldir/"
     ExecStartPre=/bin/mv /tmp/kubectldir/hyperkube /usr/local/bin/kubectl
     ExecStart=/bin/chmod a+x /usr/local/bin/kubectl
+    ExecStartPost=/bin/echo "source <(kubectl completion bash)" >> /etc/profile
 
     [Install]
     WantedBy=multi-user.target
