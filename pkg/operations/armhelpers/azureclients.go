@@ -231,6 +231,7 @@ func getClient(env azure.Environment, subscriptionID string, armSpt *adal.Servic
 	c.RoleAssignmentsClient.Authorizer = authorizer
 	c.ResourcesClient.Authorizer = authorizer
 	c.ProvidersClient.Authorizer = authorizer
+	c.VirtualMachinesClient.Authorizer = authorizer
 
 	err := c.ensureProvidersRegistered(subscriptionID)
 	if err != nil {
