@@ -10,12 +10,12 @@
 package acsengine
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/Azure/azure-sdk-for-go/arm/resources/resources"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/adal"
+	"github.com/Sirupsen/logrus"
 	"github.com/satori/go.uuid"
 )
 
@@ -77,7 +77,7 @@ func (a *armDeployer) CreateOrUpdate(resourceGroup, name string, d *resources.De
 
 // Delete implements the TemplateDeployer interface
 func (a *armDeployer) Delete(resourceGroup, name string, cancel chan struct{}) error {
-	res, err := a.client.Delete(resourceGroup, name, cancel)
+	_, err := a.client.Delete(resourceGroup, name, cancel)
 	if e := <-err; e != nil {
 		logrus.Errorf("Error deleting deployment: %s", e.Error())
 		return e
