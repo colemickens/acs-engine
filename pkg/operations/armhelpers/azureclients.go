@@ -31,6 +31,9 @@ import (
 const (
 	// AcsEngineClientID is the AAD ClientID for the CLI native application
 	AcsEngineClientID = "76e0feec-6b7f-41f0-81a7-b1b944520261"
+
+	// ApplicationDir is the name of the dir where the token is cached
+	ApplicationDir = ".acsengine"
 )
 
 var (
@@ -62,7 +65,7 @@ func NewAzureClientWithDeviceAuth(env azure.Environment, subscriptionID string) 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get user home directory to look for cached token: %q", err)
 	}
-	cachePath := filepath.Join(home, ".azkube", fmt.Sprintf("token-cache-%s.json", tenantID))
+	cachePath := filepath.Join(home, ApplicationDir, "cache", fmt.Sprintf("%s_%s.token.json", tenantID, AcsEngineClientID))
 
 	rawToken, err := tryLoadCachedToken(cachePath)
 	if err != nil {
