@@ -1,11 +1,16 @@
 package cmd
 
 import (
+	"fmt"
+	"math/rand"
 	"os"
 	"path"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
+
+	"encoding/json"
 
 	"github.com/Azure/acs-engine/pkg/acsengine"
 	"github.com/Azure/acs-engine/pkg/api"
@@ -37,6 +42,7 @@ type generateCmd struct {
 	client        armhelpers.UberClient
 	deploy        bool
 	resourceGroup string
+	random        *rand.Rand
 	location      string
 }
 
@@ -120,6 +126,8 @@ func (gc *generateCmd) validate(cmd *cobra.Command, args []string) {
 			log.Fatal("--resource-group is required when deploying")
 		}
 	}
+
+	gc.random = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
 func (gc *generateCmd) run() error {
@@ -151,6 +159,31 @@ func (gc *generateCmd) run() error {
 	}
 
 	if gc.deploy {
+		templateJSON := make(map[string]interface{})
+		parametersJSON := make(map[string]interface{})
+
+		err = json.Unmarshal([]byte(template), &templateJSON)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		deploymentSuffix := gc.random.Int31()
+
+		// TODO(colemick): precreate resource group based on location
+
+		err = json.Unmarshal([]byte(parameters), &parametersJSON)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		_, err := armhelpers.DeployTemplate(
+			gc.client.TemplateDeployer(),
+			gc.resourceGroup,
+			fmt.Sprintf("%s-%d", gc.resourceGroup, deploymentSuffix),
+			templateJSON,
+			parametersJSON)
+		if err != nil {
+			log.Fatalln(err)
+		}
 		log.Warnf("DEPLOY GOES HERE")
 		log.Warnf("DEPLOY GOES HERE - use location")
 		log.Warnf("DEPLOY GOES HERE")
