@@ -26,10 +26,23 @@ fi
 # ./test/upgrade.sh [deploy-dir] [rg] [upgrademodel-file]
 # ./test/upgrade.sh ./_output/colemick-<TAB> colemick-<SAME VAL> ./examples/operations/upgrade/kubernetes-1.6.2.json
 
+# device auth:
+# ./test/upgrade.sh ./_output/colemick-<TAB> colemick-<SAME VAL> ./examples/operations/upgrade/kubernetes-1.6.2.json device
+
 DEPLOYMENT_DIR="${1}"
 RESOURCE_GROUP="${2}"
 UPGRADE_MODEL="${3}"
 
+AUTH_METHOD="${4:-device}"
+
 # make -C "${ROOT}" ci # this ensure you didn't accidentally forget to regen
 make -C "${ROOT}" build
-"${ROOT}/acs-engine" upgrade --subscription-id="${SUBSCRIPTION_ID}" --auth-method=client-secret --client-id="${SERVICE_PRINCIPAL_CLIENT_ID}" --client-secret "${SERVICE_PRINCIPAL_CLIENT_SECRET}" --upgrademodel-file="${UPGRADE_MODEL}" --deployment-dir="${DEPLOYMENT_DIR}" --resource-group="${RESOURCE_GROUP}"
+"${ROOT}/acs-engine" upgrade \
+  --subscription-id="${SUBSCRIPTION_ID}" \
+  --auth-method="${AUTH_METHOD}" \
+  --client-id="${SERVICE_PRINCIPAL_CLIENT_ID}" \
+  --client-secret "${SERVICE_PRINCIPAL_CLIENT_SECRET}" \
+  --upgrademodel-file="${UPGRADE_MODEL}" \
+  --deployment-dir="${DEPLOYMENT_DIR}" \
+  --resource-group="${RESOURCE_GROUP}" \
+  --debug
