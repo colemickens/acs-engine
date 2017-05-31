@@ -7,6 +7,16 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+// DeleteOrphanedOSDisks deletes any OS disks in this cluster's storage accounts that do not have a corresponding
+// VirtualMachine using it.
+func DeleteOrphanedOSDisks(az armhelpers.ACSEngineClient, logger *log.Entry, resourceGroup, name string) error {
+	// enumerate all storage accounts possible for this cluster <- how?
+	// look in each storage account
+	// check for a disk name present in a map
+
+	return nil
+}
+
 // CleanDeleteVirtualMachine deletes a VM and any associated OS disk
 func CleanDeleteVirtualMachine(az armhelpers.ACSEngineClient, logger *log.Entry, resourceGroup, name string) error {
 	logger.Infof("fetching VM: %s/%s", resourceGroup, name)
