@@ -28,9 +28,16 @@ func (az *AzureClient) DeployTemplate(resourceGroupName, deploymentName string, 
 	}
 	res := <-resChan
 
+	deploymentResult, err := az.deploymentsClient.Get(
+		resourceGroupName,
+		deploymentName)
+	if err != nil {
+		return nil, err
+	}
+
 	log.Infof("Finished ARM Deployment. deployment=%q. res=%q", deploymentName, res)
 
-	return &res, nil
+	return &deploymentResult, nil
 }
 
 // ValidateTemplate validate the template and parameters

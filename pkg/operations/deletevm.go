@@ -9,7 +9,7 @@ import (
 
 // DeleteOrphanedOSDisks deletes any OS disks in this cluster's storage accounts that do not have a corresponding
 // VirtualMachine using it.
-func DeleteOrphanedOSDisks(az armhelpers.ACSEngineClient, logger *log.Entry, resourceGroup, name string) error {
+func DeleteOrphanedOSDisks(az armhelpers.ACSEngineClient, logger *log.Entry, storageAccountNames []string) error {
 	// enumerate all storage accounts possible for this cluster <- how?
 	// look in each storage account
 	// check for a disk name present in a map

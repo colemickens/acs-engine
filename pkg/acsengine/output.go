@@ -25,7 +25,7 @@ func WriteArtifacts(containerService *api.ContainerService, apiVersion, template
 			return err
 		}
 
-		if e := saveFile(artifactsDir, "apimodel.json", b); e != nil {
+		if e := SaveFile(artifactsDir, "apimodel.json", b); e != nil {
 			return e
 		}
 
@@ -91,10 +91,10 @@ func WriteArtifacts(containerService *api.ContainerService, apiVersion, template
 }
 
 func saveFileString(dir string, file string, data string) error {
-	return saveFile(dir, file, []byte(data))
+	return SaveFile(dir, file, []byte(data))
 }
 
-func saveFile(dir string, file string, data []byte) error {
+func SaveFile(dir string, file string, data []byte) error {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		if e := os.MkdirAll(dir, 0700); e != nil {
 			return fmt.Errorf("error creating directory '%s': %s", dir, e.Error())
