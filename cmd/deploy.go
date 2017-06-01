@@ -174,7 +174,7 @@ func (dc *deployCmd) run() error {
 
 	deploymentSuffix := dc.random.Int31()
 
-	_, err = dc.client.DeployTemplate(
+	deploymentExtended, err := dc.client.DeployTemplate(
 		dc.resourceGroup,
 		fmt.Sprintf("%s-%d", dc.resourceGroup, deploymentSuffix),
 		templateJSON,
@@ -183,6 +183,13 @@ func (dc *deployCmd) run() error {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	deploymentData, err := json.MarshalIndent(deploymentExtended, "", "  ")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	acsengine.SaveFile(dc.outputDirectory, "azuredeploy.output.json", deploymentData)
 
 	return nil
 }
