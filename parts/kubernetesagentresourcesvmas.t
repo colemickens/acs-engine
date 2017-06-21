@@ -52,7 +52,7 @@
         {
             "platformFaultDomainCount": "3",
             "platformUpdateDomainCount": "3",
-                "managed" : "true"
+		"managed" : "true"
         },
   
       "type": "Microsoft.Compute/availabilitySets"
@@ -215,7 +215,7 @@
        "location": "[resourceGroup().location]",
        "dependsOn": [
          "[concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), copyIndex())]",
-         "[concat('Microsoft.Resources/deployments/vm-msi-rbac-', variables('{{.Name}}VMNamePrefix'), copyIndex())]"
+         "[concat('Microsoft.Authorization/roleAssignments/', uniqueGuid(reference(concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), copyIndex('{{.Name}}Offset')), '2017-03-30', 'Full').identity.principalId), 'vmidentity'))]"
        ],
        "properties": {
          "publisher": "Microsoft.ManagedIdentity",

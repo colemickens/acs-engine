@@ -461,7 +461,7 @@
        "location": "[resourceGroup().location]",
        "dependsOn": [
          "[concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex())]",
-         "[concat('Microsoft.Resources/deployments/vm-msi-rbac-', variables('masterVMNamePrefix'), copyIndex())]"
+         "[concat('Microsoft.Authorization/roleAssignments/', uniqueGuid(reference(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex('masterOffset')), '2017-03-30', 'Full').identity.principalId), 'vmidentity'))]"
        ],
        "properties": {
          "publisher": "Microsoft.ManagedIdentity",
