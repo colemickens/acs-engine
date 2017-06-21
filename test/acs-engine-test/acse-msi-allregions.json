@@ -1,0 +1,12 @@
+{
+  "deployments": [
+    {
+      "cluster_definition": "managed-identity/kubernetes.json",
+      "location": "westus"
+    },
+    {
+      "cluster_definition": "managed-identity/kubernetes.json",
+      "location": "westus2"
+    }
+  ]
+}
