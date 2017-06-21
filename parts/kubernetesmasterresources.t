@@ -442,24 +442,14 @@
     },
     {{if UseManagedIdentity}}
     {
-       "apiVersion": "2015-01-01",
-       "type": "Microsoft.Resources/deployments",
-       "copy": {
-         "count": "[variables('masterCount')]",
-         "name": "vmLoopNode"
-       },
-       "name": "[concat('vm-msi-rbac-', variables('masterVMNamePrefix'), copyIndex())]",
-       "dependsOn": [
-         "[concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex())]"
-       ],
-       "properties": {
-         "mode": "incremental",
-         "templateLink": {
-           "uri": "[concat('https://rbacgenerator.azurewebsites.net/api/rbacgenerator?subscription_id=', variables('subscriptionId'), '&resource_group=', variables('resourceGroup'), '&role_id=', variables('contributorRoleDefinitionId'), '&vm_name=', variables('masterVMNamePrefix'), copyIndex(), '&principal_id=', reference(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex()), '2017-03-30', 'Full').identity.principalId)]",
-           "contentVersion": "1.0.0.0"
-         }
-       }
-     },
+      "apiVersion": "2014-10-01-preview",
+      "name": "[uniqueGuid(reference(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex('masterOffset')), '2017-03-30', 'Full').identity.principalId), 'vmidentity')]",
+      "type": "Microsoft.Compute/virtualMachines/providers/roleAssignments",
+      "properties": {
+        "roleDefinitionId": "[variables('contributorRoleDefinitionId')]",
+        "principalId": "[reference(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex('masterOffset')), '2017-03-30', 'Full').identity.principalId)]"
+      }
+    },
      {
        "type": "Microsoft.Compute/virtualMachines/extensions",
        "name": "[concat(variables('masterVMNamePrefix'), copyIndex(), '/ManagedIdentityExtension')]",
