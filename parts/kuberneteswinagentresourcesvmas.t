@@ -177,11 +177,15 @@
     {{if UseManagedIdentity}}
     {
       "apiVersion": "2014-10-01-preview",
-      "name": "[uniqueGuid(reference(concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), copyIndex('{{.Name}}Offset')), '2017-03-30', 'Full').identity.principalId), 'vmidentity')]",
+      "copy": {
+         "count": "[variables('{{.Name}}Count')]",
+         "name": "vmLoopNode"
+       },
+      "name": "[uniqueGuid(concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), 'vmidentity'))]",
       "type": "Microsoft.Compute/virtualMachines/providers/roleAssignments",
       "properties": {
         "roleDefinitionId": "[variables('readerRoleDefinitionId')]",
-        "principalId": "[reference(concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), copyIndex('{{.Name}}Offset')), '2017-03-30', 'Full').identity.principalId)]"
+        "principalId": "[reference(concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), copyIndex()), '2017-03-30', 'Full').identity.principalId)]"
       }
     },
       {
@@ -195,7 +199,7 @@
         "location": "[resourceGroup().location]",
         "dependsOn": [
           "[concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), copyIndex())]",
-          "[concat('Microsoft.Authorization/roleAssignments/', uniqueGuid(reference(concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), copyIndex('{{.Name}}Offset')), '2017-03-30', 'Full').identity.principalId), 'vmidentity'))]"
+          "[uniqueGuid(concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), 'vmidentity'))]"
         ],
         "properties": {
           "publisher": "Microsoft.ManagedIdentity",

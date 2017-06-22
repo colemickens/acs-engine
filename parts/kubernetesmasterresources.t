@@ -368,6 +368,7 @@
         "orchestrator" : "[variables('orchestratorNameVersionTag')]"
       },
       "location": "[variables('location')]",
+      "name": "[concat(variables('masterVMNamePrefix'), copyIndex(variables('masterOffset')))]",
       {{if UseManagedIdentity}}
       "identity": {
         "type": "systemAssigned"
@@ -443,11 +444,15 @@
     {{if UseManagedIdentity}}
     {
       "apiVersion": "2014-10-01-preview",
-      "name": "[uniqueGuid(reference(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex('masterOffset')), '2017-03-30', 'Full').identity.principalId), 'vmidentity')]",
+      "copy": {
+         "count": "[variables('masterCount')]",
+         "name": "vmLoopNode"
+       },
+      "name": "[uniqueGuid(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), 'vmidentity')]",
       "type": "Microsoft.Compute/virtualMachines/providers/roleAssignments",
       "properties": {
         "roleDefinitionId": "[variables('contributorRoleDefinitionId')]",
-        "principalId": "[reference(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex('masterOffset')), '2017-03-30', 'Full').identity.principalId)]"
+        "principalId": "[reference(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex()), '2017-03-30', 'Full').identity.principalId)]"
       }
     },
      {
@@ -461,7 +466,7 @@
        "location": "[resourceGroup().location]",
        "dependsOn": [
          "[concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex())]",
-         "[concat('Microsoft.Authorization/roleAssignments/', uniqueGuid(reference(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex('masterOffset')), '2017-03-30', 'Full').identity.principalId), 'vmidentity'))]"
+         "[uniqueGuid(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), 'vmidentity'))]"
        ],
        "properties": {
          "publisher": "Microsoft.ManagedIdentity",
