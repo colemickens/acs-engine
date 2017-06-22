@@ -19,6 +19,7 @@ type MockACSEngineClient struct {
 	FailDeleteVirtualMachine        bool
 	FailGetStorageClient            bool
 	FailDeleteNetworkInterface      bool
+	FailPowerOffVirtualMachine      bool
 }
 
 //MockStorageClient mock implementation of StorageClient
@@ -182,6 +183,25 @@ func (mc *MockACSEngineClient) DeleteVirtualMachine(resourceGroup, name string, 
 		errChan <- nil
 		respChan <- compute.OperationStatusResponse{}
 		time.Sleep(1 * time.Second)
+	}()
+	return respChan, errChan
+}
+
+//PowerOffVirtualMachine mock
+func (mc *MockACSEngineClient) PowerOffVirtualMachine(resourceGroup, name string, cancel <-chan struct{}) (<-chan compute.OperationStatusResponse, <-chan error) {
+	// TODO: this refactor should be applied to the other mocked clients
+	errChan := make(chan error)
+	respChan := make(chan compute.OperationStatusResponse)
+	go func() {
+		defer close(errChan)
+		defer close(respChan)
+		if mc.FailPowerOffVirtualMachine {
+			errChan <- fmt.Errorf("PowerOffVirtualMachine failed")
+			respChan <- compute.OperationStatusResponse{}
+		} else {
+			errChan <- nil
+			respChan <- compute.OperationStatusResponse{}
+		}
 	}()
 	return respChan, errChan
 }

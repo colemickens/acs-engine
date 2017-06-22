@@ -37,6 +37,9 @@ type ACSEngineClient interface {
 	// ListVirtualMachineScaleSets lists the vmss resources in the resource group
 	ListVirtualMachineScaleSets(resourceGroup string) (compute.VirtualMachineScaleSetListResult, error)
 
+	// PowerOffVirtualMachine powers off the specified virtual machine.
+	PowerOffVirtualMachine(resourceGroup, name string, cancel <-chan struct{}) (<-chan compute.OperationStatusResponse, <-chan error)
+
 	//
 	// STORAGE
 

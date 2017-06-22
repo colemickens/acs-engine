@@ -23,3 +23,8 @@ func (az *AzureClient) DeleteVirtualMachine(resourceGroup, name string, cancel <
 func (az *AzureClient) ListVirtualMachineScaleSets(resourceGroup string) (compute.VirtualMachineScaleSetListResult, error) {
 	return az.virtualMachineScaleSetsClient.List(resourceGroup)
 }
+
+// PowerOffVirtualMachine handles powering off of a CRP/VMAS VM (aka, not a VMSS VM).
+func (az *AzureClient) PowerOffVirtualMachine(resourceGroup, name string, cancel <-chan struct{}) (<-chan compute.OperationStatusResponse, <-chan error) {
+	return az.virtualMachinesClient.PowerOff(resourceGroup, name, cancel)
+}
