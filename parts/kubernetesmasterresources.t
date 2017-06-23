@@ -448,7 +448,7 @@
          "count": "[variables('masterCount')]",
          "name": "vmLoopNode"
        },
-      "name": "[uniqueGuid(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), 'vmidentity')]",
+      "name": "[guid(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), 'vmidentity')]",
       "type": "Microsoft.Compute/virtualMachines/providers/roleAssignments",
       "properties": {
         "roleDefinitionId": "[variables('contributorRoleDefinitionId')]",
@@ -466,7 +466,7 @@
        "location": "[resourceGroup().location]",
        "dependsOn": [
          "[concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex())]",
-         "[uniqueGuid(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), 'vmidentity'))]"
+         "[guid(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), 'vmidentity'))]"
        ],
        "properties": {
          "publisher": "Microsoft.ManagedIdentity",
