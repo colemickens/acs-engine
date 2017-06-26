@@ -202,7 +202,7 @@
          "name": "vmLoopNode"
        },
       "name": "[guid(concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), 'vmidentity'))]",
-      "type": "Microsoft.Compute/virtualMachines/providers/roleAssignments",
+      "type": "Microsoft.Authorization/roleAssignments",
       "properties": {
         "roleDefinitionId": "[variables('readerRoleDefinitionId')]",
         "principalId": "[reference(concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), copyIndex()), '2017-03-30', 'Full').identity.principalId)]"
@@ -219,7 +219,7 @@
        "location": "[resourceGroup().location]",
        "dependsOn": [
          "[concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), copyIndex())]",
-         "[guid(concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), 'vmidentity'))]"
+         "[concat('Microsoft.Authorization', guid(concat('Microsoft.Compute/virtualMachines/', variables('{{.Name}}VMNamePrefix'), 'vmidentity')))]"
        ],
        "properties": {
          "publisher": "Microsoft.ManagedIdentity",
