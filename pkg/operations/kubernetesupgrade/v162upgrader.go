@@ -7,6 +7,7 @@ import (
 	"github.com/Azure/acs-engine/pkg/acsengine"
 	"github.com/Azure/acs-engine/pkg/api"
 	"github.com/Azure/acs-engine/pkg/armhelpers"
+	"github.com/Azure/acs-engine/pkg/operations"
 	log "github.com/Sirupsen/logrus"
 )
 
@@ -38,8 +39,13 @@ func (ku *Kubernetes162upgrader) RunUpgrade() error {
 		return err
 	}
 
+	// TODO: This should probably be taking a logger from higher up rather than building a new one here...
+	l := log.NewEntry(log.New())
+
 	ku.GoalStateDataModel = ku.ClusterTopology.DataModel
 	ku.GoalStateDataModel.Properties.OrchestratorProfile.OrchestratorVersion = api.Kubernetes162
+
+	operations.CleanUpOrphanedDisks(ku.Client, ku.GoalStateDataModel, l)
 
 	if err := ku.upgradeMasterNodes(); err != nil {
 		return err
