@@ -1,10 +1,17 @@
-hash: 67f0e13bc8656b6069da7262fee9163e3791a894814f702a0c43431b97b4c724
-updated: 2017-07-05T13:40:43.051816462-07:00
+<<<<<<< HEAD
+hash: 5df79f94b3d65724a9dd1967848d7ff0e9f55cb313b21d468fcdeea970a92ae2
+updated: 2017-07-13T04:23:04.455532186-07:00
+=======
+hash: 377ad2f93191b05a96fc8ce11efb4630f8207320dd17c02d1441a5646e29092a
+updated: 2017-06-29T02:36:47.3530472-07:00
+>>>>>>> 7cd2146a... stash
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 59c277f1b488b81b1a5f944212f25b69bea8ece3
   subpackages:
+  - arm/authorization
   - arm/compute
+  - arm/graphrbac
   - arm/network
   - arm/resources/resources
   - arm/resources/subscriptions
@@ -47,6 +54,13 @@ imports:
   version: 4cdb38c072b86bf795d2c81de50784d9fdd6eb77
 - name: github.com/spf13/pflag
   version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
+- name: golang.org/x/crypto
+  version: 5ef0053f77724838734b6945dd364d3847e5de1d
+  subpackages:
+  - curve25519
+  - ed25519
+  - ed25519/internal/edwards25519
+  - ssh
 - name: golang.org/x/sys
   version: a55a76086885b80f79961eacb876ebd8caf3868d
   subpackages:

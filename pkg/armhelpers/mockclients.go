@@ -29,7 +29,7 @@ func (msc *MockStorageClient) DeleteBlob(container, blob string) error {
 	return nil
 }
 
-//AddAcceptLanguage mock
+//AddAcceptLanguages mock
 func (mc *MockACSEngineClient) AddAcceptLanguages(languages []string) {
 	return
 }

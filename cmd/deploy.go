@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"os"
 	"path"
+	"strconv"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
@@ -27,6 +28,8 @@ type deployCmd struct {
 	authArgs
 
 	apimodelPath      string
+	dnsPrefix         string
+	autoSuffix        bool
 	outputDirectory   string // can be auto-determined from clusterDefinition
 	caCertificatePath string
 	caPrivateKeyPath  string
@@ -60,7 +63,9 @@ func newDeployCmd() *cobra.Command {
 	}
 
 	f := deployCmd.Flags()
-	f.StringVar(&dc.apimodelPath, "api-model", "", "")
+	f.StringVar(&dc.apimodelPath, "api-model", "", "path to the apimodel file")
+	f.StringVar(&dc.dnsPrefix, "dns-prefix", "", "dns prefix (unique name for the cluster)")
+	f.BoolVar(&dc.autoSuffix, "auto-suffix", false, "automatically append a compressed timestamp to the dnsPrefix to ensure unique cluster name automatically")
 	f.StringVar(&dc.outputDirectory, "output-directory", "", "output directory (derived from FQDN if absent)")
 	f.StringVar(&dc.caCertificatePath, "ca-certificate-path", "", "path to the CA certificate to use for Kubernetes PKI assets")
 	f.StringVar(&dc.caPrivateKeyPath, "ca-private-key-path", "", "path to the CA private key to use for Kubernetes PKI assets")
@@ -71,6 +76,11 @@ func newDeployCmd() *cobra.Command {
 	addAuthFlags(&dc.authArgs, f)
 
 	return deployCmd
+}
+
+// This can be expensive! This makes repeated calls to the network
+func (dc *deployCmd) populateDefaults() {
+
 }
 
 func (dc *deployCmd) validate(cmd *cobra.Command, args []string) {
@@ -94,9 +104,37 @@ func (dc *deployCmd) validate(cmd *cobra.Command, args []string) {
 		log.Fatalf("specified api model does not exist (%s)", dc.apimodelPath)
 	}
 
-	dc.containerService, dc.apiVersion, err = api.LoadContainerServiceFromFile(dc.apimodelPath)
+	// skip validating the model fields for now
+	dc.containerService, dc.apiVersion, err = api.LoadContainerServiceFromFile(dc.apimodelPath, false)
 	if err != nil {
 		log.Fatalf("error parsing the api model: %s", err.Error())
+	}
+
+	if dc.location == "" {
+		log.Fatalf("--subscription-id must be specified")
+	}
+
+	if dc.containerService.Properties.LinuxProfile.AdminUsername == "" {
+		log.Warnf("apimodel: no linuxProfile.adminUsername was specified. Will use 'azureuser'.")
+		dc.containerService.Properties.LinuxProfile.AdminUsername = "azureuser"
+	}
+
+	if dc.dnsPrefix != "" && dc.containerService.Properties.MasterProfile.DNSPrefix != "" {
+		log.Fatalf("invalid configuration: the apimodel masterProfile.dnsPrefix and --dns-prefix were both specified")
+	}
+	if dc.containerService.Properties.MasterProfile.DNSPrefix == "" {
+		if dc.dnsPrefix == "" {
+			log.Fatalf("apimodel: missing masterProfile.dnsPrefix and --dns-prefix was not specified")
+		}
+
+		dnsPrefix := dc.dnsPrefix
+		if dc.autoSuffix {
+			suffix := strconv.FormatInt(time.Now().Unix(), 16)
+			dnsPrefix = dnsPrefix + "-" + suffix
+		}
+
+		log.Warnf("apimodel: missing masterProfile.dnsPrefix will use %q", dnsPrefix)
+		dc.containerService.Properties.MasterProfile.DNSPrefix = dnsPrefix
 	}
 
 	if dc.outputDirectory == "" {
@@ -105,12 +143,28 @@ func (dc *deployCmd) validate(cmd *cobra.Command, args []string) {
 
 	if dc.resourceGroup == "" {
 		dnsPrefix := dc.containerService.Properties.MasterProfile.DNSPrefix
-		log.Warnf("--resource-group was not specified. Using the DNS prefix from the apimodel as the resource group name: %s")
+		log.Warnf("--resource-group was not specified. Using the DNS prefix from the apimodel as the resource group name: %s", dnsPrefix)
 		dc.resourceGroup = dnsPrefix
 		if dc.location == "" {
 			// TODO: move this so we only require location for a non-pre-existing RG?
 			log.Fatal("--resource-group was not specified. --location must be specified in case the resource group needs creation.")
 		}
+	}
+
+	if dc.containerService.Properties.LinuxProfile.SSH.PublicKeys == nil {
+		dc.containerService.Properties.LinuxProfile.SSH.PublicKeys = []api.PublicKey{}
+	}
+	if len(dc.containerService.Properties.LinuxProfile.SSH.PublicKeys) == 0 ||
+		dc.containerService.Properties.LinuxProfile.SSH.PublicKeys[0].KeyData == "" {
+		// TODO: discuss how generic we want these apimodels to look like...
+		//       Do we want to infer username via the os username instead?
+		_, publicKey, err := acsengine.CreateSaveSSH(dc.containerService.Properties.LinuxProfile.AdminUsername, dc.outputDirectory)
+		if err != nil {
+			// TODO: nicer msg
+			log.Fatal("failed to generate SSH Key")
+		}
+
+		dc.containerService.Properties.LinuxProfile.SSH.PublicKeys = []api.PublicKey{api.PublicKey{KeyData: publicKey}}
 	}
 
 	if len(caKeyBytes) != 0 {
@@ -124,6 +178,51 @@ func (dc *deployCmd) validate(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatalf("failed to get client") // TODO: cleanup
 	}
+
+	_, err = dc.client.EnsureResourceGroup(dc.resourceGroup, dc.location)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	spp := dc.containerService.Properties.ServicePrincipalProfile
+	if spp == nil || spp.ClientID == "" || spp.Secret == "" {
+		// TODO: don't do this whenever the user specifies MSI is enabled
+		if !(spp.ClientID == "" && spp.Secret == "") {
+			log.Fatal("apimodel invalid: ServicePrincipalProfile is missing either the clientid or secret.")
+		}
+
+		log.Warnln("apimodel: ServicePrincipalProfile was empty, creating application...")
+
+		// consider caching the creds here so they persist between subsequent runs of 'deploy'
+
+		appName := dc.containerService.Properties.MasterProfile.DNSPrefix
+		appURL := fmt.Sprintf("https://%s/", appName)
+		_, clientID, secret, err := dc.client.CreateApp(appName, appURL)
+		if err != nil {
+			log.Fatalf("apimodel invalid: ServicePrincipalProfile was empty, and we failed to create valid credentials: %q", err)
+		}
+
+		// TODO: back off, give up, etc - use lib in az cp now
+		log.Warnln("apimodel: ServicePrincipalProfile was empty, assigning role to application...")
+		for {
+			err = dc.client.CreateRoleAssignmentSimple(dc.resourceGroup, clientID)
+			if err != nil {
+				log.Warnf("Failed to create role assignment (will retry): %q", err)
+				time.Sleep(3 * time.Second)
+				continue
+			}
+			break
+		}
+
+		dc.containerService.Properties.ServicePrincipalProfile = &api.ServicePrincipalProfile{
+			ClientID: clientID,
+			Secret:   secret,
+		}
+	}
+
+	// now lets validate the model fields
+	// TODO: not sure of the best way to handle this
+	// *dc.containerService.Properties.Validate()
 
 	dc.random = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
@@ -154,11 +253,6 @@ func (dc *deployCmd) run() error {
 	}
 
 	log.Infoln("deploying...")
-
-	_, err = dc.client.EnsureResourceGroup(dc.resourceGroup, dc.location)
-	if err != nil {
-		log.Fatalln(err)
-	}
 
 	templateJSON := make(map[string]interface{})
 	parametersJSON := make(map[string]interface{})
