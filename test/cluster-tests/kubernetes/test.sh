@@ -250,3 +250,5 @@ if [[ "${success}" != "y" ]]; then
 fi
 
 check_node_count
+
+exit -1
