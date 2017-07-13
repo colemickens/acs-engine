@@ -121,7 +121,8 @@ cat << EOF > "${AZURE_JSON_PATH}"
     "cloudProviderBackoffJitter": ${CLOUDPROVIDER_BACKOFF_JITTER},
     "cloudProviderRatelimit": ${CLOUDPROVIDER_RATELIMIT},
     "cloudProviderRateLimitQPS": ${CLOUDPROVIDER_RATELIMIT_QPS},
-    "cloudProviderRateLimitBucket": ${CLOUDPROVIDER_RATELIMIT_BUCKET}
+    "cloudProviderRateLimitBucket": ${CLOUDPROVIDER_RATELIMIT_BUCKET},
+    "useManagedServiceIdentityExtension": true
 }
 EOF
 

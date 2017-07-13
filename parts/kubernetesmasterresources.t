@@ -390,6 +390,11 @@
       },
       "location": "[variables('location')]",
       "name": "[concat(variables('masterVMNamePrefix'), copyIndex(variables('masterOffset')))]",
+      {{if UseManagedIdentity}}
+      "identity": {
+        "type": "systemAssigned"
+      },
+      {{end}}
       "properties": {
         "availabilitySet": {
           "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('masterAvailabilitySet'))]"
@@ -462,6 +467,45 @@
       },
       "type": "Microsoft.Compute/virtualMachines"
     },
+    {{if UseManagedIdentity}}
+    {
+      "apiVersion": "2014-10-01-preview",
+      "copy": {
+         "count": "[variables('masterCount')]",
+         "name": "vmLoopNode"
+       },
+      "name": "[guid(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex(),'vmidentity'))]",
+      "type": "Microsoft.Authorization/roleAssignments",
+      "properties": {
+        "roleDefinitionId": "[variables('contributorRoleDefinitionId')]",
+        "principalId": "[reference(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex()), '2017-03-30', 'Full').identity.principalId]"
+      }
+    },
+     {
+       "type": "Microsoft.Compute/virtualMachines/extensions",
+       "name": "[concat(variables('masterVMNamePrefix'), copyIndex(), '/ManagedIdentityExtension')]",
+       "copy": {
+         "count": "[variables('masterCount')]",
+         "name": "vmLoopNode"
+       },
+       "apiVersion": "2015-05-01-preview",
+       "location": "[resourceGroup().location]",
+       "dependsOn": [
+         "[concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex())]",
+         "[concat('Microsoft.Authorization/roleAssignments/', guid(concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex(), 'vmidentity')))]"
+       ],
+       "properties": {
+         "publisher": "Microsoft.ManagedIdentity",
+         "type": "ManagedIdentityExtensionForLinux",
+         "typeHandlerVersion": "1.0",
+         "autoUpgradeMinorVersion": true,
+         "settings": {
+           "port": 50343
+         },
+         "protectedSettings": {}
+       }
+     },
+     {{end}}
     {
       "apiVersion": "[variables('apiVersionDefault')]",
       "copy": {
@@ -469,7 +513,11 @@
         "name": "vmLoopNode"
       },
       "dependsOn": [
+        {{if UseManagedIdentity}}
+        "[concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex(variables('masterOffset')), '/extensions/ManagedIdentityExtension')]"
+        {{else}}
         "[concat('Microsoft.Compute/virtualMachines/', variables('masterVMNamePrefix'), copyIndex(variables('masterOffset')))]"
+        {{end}}
       ],
       "location": "[variables('location')]",
       "type": "Microsoft.Compute/virtualMachines/extensions",
