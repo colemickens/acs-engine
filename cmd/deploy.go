@@ -76,8 +76,6 @@ func newDeployCmd() *cobra.Command {
 }
 
 func (dc *deployCmd) validate(cmd *cobra.Command, args []string) {
-	var caCertificateBytes []byte
-	var caKeyBytes []byte
 	var err error
 
 	if dc.apimodelPath == "" {
@@ -105,6 +103,20 @@ func (dc *deployCmd) validate(cmd *cobra.Command, args []string) {
 	if dc.location == "" {
 		log.Fatalf("--subscription-id must be specified")
 	}
+
+	// autofillApimodel calls log.Fatal() directly and does not return errors
+	autofillApimodel(dc)
+
+	err = revalidateApimodel(dc.containerService, dc.apiVersion)
+	if err != nil {
+		log.Fatalf("Failed to validate the apimodel after populating values: %s", err)
+	}
+
+	dc.random = rand.New(rand.NewSource(time.Now().UnixNano()))
+}
+
+func autofillApimodel(dc *deployCmd) {
+	var err error
 
 	if dc.containerService.Properties.LinuxProfile.AdminUsername == "" {
 		log.Warnf("apimodel: no linuxProfile.adminUsername was specified. Will use 'azureuser'.")
@@ -152,14 +164,6 @@ func (dc *deployCmd) validate(cmd *cobra.Command, args []string) {
 
 		dc.containerService.Properties.LinuxProfile.SSH.PublicKeys = []api.PublicKey{api.PublicKey{KeyData: publicKey}}
 	}
-
-	if len(caKeyBytes) != 0 {
-		// the caKey is not in the api model, and should be stored separately from the model
-		// we put these in the model after model is deserialized
-		dc.containerService.Properties.CertificateProfile.CaCertificate = string(caCertificateBytes)
-		dc.containerService.Properties.CertificateProfile.CaPrivateKey = string(caKeyBytes)
-	}
-
 	dc.client, err = dc.authArgs.getClient()
 	if err != nil {
 		log.Fatalf("failed to get client") // TODO: cleanup
@@ -204,18 +208,19 @@ func (dc *deployCmd) validate(cmd *cobra.Command, args []string) {
 			Secret:   secret,
 		}
 	}
+}
 
+func revalidateApimodel(containerService *api.ContainerService, apiVersion string) error {
 	// This isn't terribly elegant, but it's the easiest way to go for now w/o duplicating a bunch of code
-	rawVersionedAPIModel, err := api.SerializeContainerService(dc.containerService, dc.apiVersion)
+	rawVersionedAPIModel, err := api.SerializeContainerService(containerService, apiVersion)
 	if err != nil {
 		log.Fatalf("Failed to serialize the apimodel to validate it after populating values: %s", err)
 	}
-	dc.containerService, dc.apiVersion, err = api.DeserializeContainerService(rawVersionedAPIModel, true)
+	_, _, err = api.DeserializeContainerService(rawVersionedAPIModel, true)
 	if err != nil {
+		return err
 		log.Fatalf("error parsing the api model: %s", err.Error())
 	}
-
-	dc.random = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
 func (dc *deployCmd) run() error {
