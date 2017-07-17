@@ -103,6 +103,10 @@
     {
       "cluster_definition": "vnet/swarmmodevnet.json",
       "location": "uksouth"
+    },
+    {
+      "cluster_definition": "managed-identity/kubernetes.json",
+      "location": "eastus"
     }
   ]
 }

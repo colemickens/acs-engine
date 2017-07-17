@@ -7,6 +7,10 @@
     {
       "cluster_definition": "windows/kubernetes.json",
       "location": "canadacentral"
+    },
+    {
+      "cluster_definition": "managed-identity/kubernetes-hybrid.json",
+      "location": "eastus"
     }
   ]
 }
